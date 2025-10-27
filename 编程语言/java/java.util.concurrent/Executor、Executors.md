@@ -29,11 +29,11 @@ public interface ExecutorService extends Executor {
 ExecutorService 提供了如下行为
 + 任务管理：提供了更高级的任务管理功能，允许用户提交、取消和跟踪任务的执行状态，使异步编程更为便捷
     - **提交一个任务，通过Future等待任务结果返回值**
-        * **  	**`Future<?> submit (Runnable task)`
-        * `<T> Future<T> submit (Runnable task, T result)`
+        *   	Future\<?\> submit (Runnable task)
+        * \<T\> Future\<T\> submit (Runnable task, T result)
         * `<T> Future<T> submit (Callable<T> task)`
     - **提交一组任务，等待全部完成，返回全部结果**
-        * ** **`<T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks)`
+        * ****`<T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks)`
         *  `<T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit)`
     - **提交一组任务并返回第一个完成的任务的结果**
         * `<T> T invokeAny(Collection<? extends Callable<T>> tasks)`

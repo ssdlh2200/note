@@ -104,6 +104,7 @@ exports.hello = hello
 
 ### 2.5. exports和module.exports
 <div style="background-color: #ffe4e1; padding: 10px; border-left: 4px solid #f1c40f;">使用require()方法的时候永远得到的是module.exports指向的对象</div>
+
 ```js
 const username = 'ssdlh'
 function hello(){
