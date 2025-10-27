@@ -1,1 +1,0 @@
-<span>&emsp;&emsp;</span>
