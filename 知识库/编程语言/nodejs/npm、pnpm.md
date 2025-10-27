@@ -9,6 +9,9 @@
 #### init
 init命令是用来初始化一个新的Node.js项目，它的作用是创建一个packge.json文件
 
+#### install
+npm install --verbose可以查看安装时的详细日志
+
 ### 1.3. package.json文件
 #### scripts
 **npm run \<script\>** 会执行scripts中定义的脚本
