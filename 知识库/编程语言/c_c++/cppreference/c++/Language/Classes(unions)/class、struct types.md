@@ -22,3 +22,4 @@ base-clause ﻿(optional)
 - **baes-clause：** 基类列表，指定继承的类型及其访问控制（public Base，private Base）
 - **member-specification：** 类的主体，包含成员变量，成员函数，访问说明符
 ## 向前声明
+test
