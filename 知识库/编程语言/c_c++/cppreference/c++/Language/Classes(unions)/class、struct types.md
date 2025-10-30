@@ -21,5 +21,87 @@ base-clause ﻿(optional)
     - replaceable_if_eligible(c++26)：如果符合条件，标记类可替换
 - **baes-clause：** 基类列表，指定继承的类型及其访问控制（public Base，private Base）
 - **member-specification：** 类的主体，包含成员变量，成员函数，访问说明符
-## 向前声明
-test
+## 前向声明Forward declaration
+```scss
+//语法
+
+class-key attr identifier;
+```
+在当前作用域声明一个类类型，但不定义具体内容。
+在类的定义出现之前，这个类被称为不完全类（incomplete type）
+### 互相引用的类
+向前声明允许两个类相互引用🔁
+```cpp
+class Vector; // 前向声明,后面会有一个Vector的类
+
+class Matrix
+{
+    // ...
+    friend Vector operator*(const Matrix&, const Vector&);
+};
+
+class Vector
+{
+    // ...
+    friend Vector operator*(const Matrix&, const Vector&);
+};
+```
+### 减少头文件依赖
+如果某个源文件只是用类的指针或引用，那么通过向前声明可以避免包含完整的头文件，减少编译依赖
+- 在 C++ 中，当你 \#include 一个头文件时，编译器实际上把头文件内容直接插入到当前文件
+- 如果头文件很大或包含很多其他头文件，编译器就需要处理更多代码
+- 如果多个文件都包含了同样的头文件，每次编译都会重复处理，导致编译变慢
+- 过多依赖还可能引起循环依赖问题（两个类互相包含对方的头文件）
+**完整定义：** 类的所有成员，函数，大小都已知。可以创建对象，访问成员
+**前向声明：** 只告诉编译器则是一个类或者结构体，但是没有定义，不能创建对象，只能使用指针或者引用
+```cpp
+class MyClass; //前向声明
+MyClass* p; //声明指针
+MyClass& r; //声明引用
+MyClass obj; //错误，编译器不知道大小
+```
+
+```cpp
+// MyStruct.h
+#include <iosfwd> // 包含前向声明std::ostream
+struct MyStruct
+{
+    int value;
+    friend std::ostream& operator<<(std::ostream& os, const MyStruct& s);
+    // 函数的定义放在 MyStruct.cpp 中，那里才需要 #include <ostream>
+};
+
+```
+### 局部作用域中的前向声明
+如果向前声明出现在局部作用域（函数内部），它会隐藏外层作用域中相同名字的声明
+```cpp
+struct s { int a; };  
+struct s; //无影响，全局作用域内s已定义  
+  
+void g()  
+{  
+    struct s; //声明一个新的struct s(隐藏全局s)  
+    s* p; //指向局部struct s的指针  
+    struct s { char* p; }; //定义局部struct s  
+}
+```
+1. 外层有一个全局 struct s { int a; };
+2. 函数 g() 里再次写 struct s;，这定义了一个新的、局部的 s（隐藏外层的）。
+3. 到函数末尾之前，全局的 s 不可见。
+4. 这说明前向声明在局部作用域中也遵循“名字遮蔽规则”
+- **复杂情况，作为类型说明符的一部分**
+```cpp
+class U;  
+  
+namespace ns  
+{  
+    class Y f(class T p); //声明函数ns::f, 并声明ns::T, ns::Y  
+    class U f();  
+    //可以使用指针指向T和Y  
+    Y* p;  
+    T* q;  
+}
+```
+1. 声明了一个函数 f，返回类型为 Y，参数类型为 T。
+2. 由于 T 和 Y 在此命名空间中未定义，C++ 自动把它们当作前向声明的类。
+3. 第二个函数 class U f(); 中的 U 是在命名空间外定义的全局 U
