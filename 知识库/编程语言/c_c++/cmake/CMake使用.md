@@ -107,13 +107,14 @@ file(GLOB SRC_LIST ${CMAKE_CURRENT_SOURCE_DIR}/*.c)
 include_directories(头文件所在路径)
 ```
 
-## 制作库文件
+## 库文件
+### 制作库文件
 ```cmake
 add_library(库名称 STATIC/SHARED 源文件1 [源文件2] ...)
 ```
  - 库名称：分为三部分：lib+库名字+.a/.so，此处只需要指出库的名字就好，剩下的两部分会自动生成
  - STATIC/SHARE：静态库指定为 STATIC，动态库指定为SHARE
-### 制作静态库
+#### 制作静态库
 linux静态库以a结尾，windows静态库以lib结尾
 【例】：我们需要将src下的源文件编译为静态库
 ```
@@ -129,10 +130,12 @@ linux静态库以a结尾，windows静态库以lib结尾
 ```cmake
 cmake_minimum_required(VERSION 3.16)  
 project(Algorithm_c__)  
-  
-file(GLOB_RECURSE SRC_LIST ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)  
+
+# 搜索cpp源文件
+file(GLOB_RECURSE SRC_LIST ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
+# 指定出头文件所在路径
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)  
-  
+# 制作静态库
 add_library(calculate STATIC ${SRC_LIST})
 ```
 执行cmake命令，再执行make命令
@@ -141,7 +144,7 @@ cmake ./
 make
 ```
 得到静态库libcalculate.a
-### 动态库
+#### 制作动态库
 linux动态库以so结尾，windows动态库以dll结尾
 【例】：我们需要将src下的源文件编译为动态库
 ```
@@ -168,11 +171,96 @@ cmake ./
 make
 ```
 得到动态库libcalculate.so
-### 指定库文件生成路径
+#### 指定库文件生成路径
 ```cmake
 set(LIBRARY_OUTPUT_PATH ./build/)
 ```
-
-## 使用库文件
+### 使用库文件
 使用库文件要配合头文件使用
 - 库文件中都是.c的二进制数据，为了对外接口供外边使用我们需要使用头文件说明这个库文件中有哪些函数
+#### 链接静态库
+```cmake
+link_libraries(<static lib> [<static lib> ...])
+```
+- 参数1：指定出要链接的静态库的名字
+    - 可以是全名libxxx.a
+    - 也可以是去掉lib和.a之后的名字xxx
+- 参数2：其他静态库的名字
+如果该静态库不是系统提供的，可能出现静态库找不到的情况， 此时可以将静态库的路径指定出来
+```cmake
+link_directories(静态库所在的文件夹)
+```
+【例】
+```
+├── CMakeLists.txt
+├── include
+│   └── calculate.hpp
+├── lib
+│   └── libcalculate.a
+├── src
+│   └── main.cpp
+```
+我们需要在main.cpp中调用库文件
+```cmake
+cmake_minimum_required(VERSION 3.16)  
+project(Algorithm_c__)  
+  
+file(GLOB_RECURSE SRC_LIST src/*.cpp)  
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)  
+  
+link_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib)  
+link_libraries(libcalculate.a)  
+  
+add_executable(main ${SRC_LIST})
+```
+#### 链接动态库
+```cmake
+target_link_libraries <target> [权限(可选)]
+```
+- target：谁要加载动态库
+    - 该文件可能是一个源文件
+    - 该文件可能是一个动态库文件
+    - 该文件可能是一个可执行文件
+- 权限：动态库的访问权限，默认为public
+    - 如果各个动态库没有依赖关系，无需设置，默认public即可
+    - 动态库链接具有传递性，A链接B、C，D链接A，
+        - 在B、C库public情况下，D相当于链接了B、C。可以使用B、C中定义的方法
+        - 在B、C库private情况下，D无法继承B、C库
+        - 在B、C库interface情况下，A库不能调用B、C库的方法，但D能继承了B、C库<span style="background:#d3f8b6">（等待验证）</span>
+【例】
+```
+.
+├── CMakeLists.txt
+├── include
+│   └── calculate.hpp
+├── lib
+│   ├── libcalculate.dll
+│   └── libcalculate.dll.a
+├── src
+│   └── main.cpp
+```
+我们需要在main.cpp中使用动态库calculate
+```cmake
+cmake_minimum_required(VERSION 3.16)  
+project(Algorithm_c__)  
+  
+file(GLOB_RECURSE SRC_LIST src/*.cpp)  
+  
+file(GLOB_RECURSE SRC_LIST ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)  
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)  
+  
+add_executable(main ${SRC_LIST})  
+  
+target_link_directories(main PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/lib)  
+target_link_libraries(main calculate)
+```
+<div style="background-color: #ffe4e1; padding: 10px; border-left: 4px solid #f1c40f;">
+
+target_link_directories()只在编译链接阶段生效，不影响程序运行时的动态库查找路径<br>
+也就是说：<br>
+-  编译时它帮助链接器找到 `.dll.a` 或 `.lib` 文件<br>
+-  运行时系统还是去查找 `.dll` 文件，和 CMake 已经没关系了<br>
+-  当我们运行程序时，系统会按照环境变量的设置去查找动态库
+</div>
+
+
