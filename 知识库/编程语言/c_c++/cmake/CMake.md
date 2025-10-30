@@ -85,19 +85,19 @@ set(EXECUTABLE_OUTPUT_PATH 存放可执行程序的文件夹)
 
 ### 搜索文件
 
-#### aux_source_directory
+#### aux_source_directory（不会递归搜索）
 可以查找某个路径下的所有的源文件（.c或者.cpp）
 ```cmake
 aux_source_directory(<dir> <variable>)
 ```
-+ dir：要搜索的目录（<font color="#7030a0">不会递归搜索子目录</font>）
++ dir：要搜索的目录
 + variable：将从dir目录下搜索到的源文件存储到该变量
 【例子】：将${CMAKE_CURRENT_SOURCE_DIR}目录下的源文件存到变量SRC_LIST中
 ```cmake
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} SRC_LIST)  
 add_executable(Algorithm_c__ ${SRC_LIST})
 ```
-#### file
+#### file（可设置递归搜索）
 ```cmake
 file(GLOB/GLOB_RECURSE 变量名 要搜索的文件路径和文件类型)
 ```
