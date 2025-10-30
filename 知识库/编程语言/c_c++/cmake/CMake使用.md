@@ -1,4 +1,4 @@
-# CMake
+# CMake使用
 ## 编译过程
 源文件`.c`或者`.cpp`变为可执行程序需要经过下面步骤
 1. 预处理
@@ -57,7 +57,7 @@ add_executable(可执行程序名称 源文件名称...)
 | CMAKE_INSTALL_RPATH               | 安装后运行时库搜索路径                           |
 | CMAKE_INSTALL_RPATH_USE_LINK_PATH | 在运行时添加链接器搜索路径                         |
 | CMAKE_PREFIX_PATH                 | 查找第三方库的路径                             |
-
+|                                   |                                       |
 
 ## 命令
 ### set
@@ -72,19 +72,15 @@ add_executable(test main.c math_utils.c)
 set(SRC_LIST main.c math_utils.c)
 add_executable(test ${SRC_LIST})
 ```
-
 #### 指定c/c++标准
 ```cmake
 set(CMAKE_C_STANDARD 11)
 ```
-
 #### 指定输出路径
 ```cmake
 set(EXECUTABLE_OUTPUT_PATH 存放可执行程序的文件夹)
 ```
-
 ### 搜索文件
-
 #### aux_source_directory（不会递归搜索）
 可以查找某个路径下的所有的源文件（.c或者.cpp）
 ```cmake
@@ -106,11 +102,75 @@ file(GLOB/GLOB_RECURSE 变量名 要搜索的文件路径和文件类型)
 ```cmake
 file(GLOB SRC_LIST ${CMAKE_CURRENT_SOURCE_DIR}/*.c)
 ```
-
-### 搜索头文件
+### 指定头文件路径
 ```cmake
 include_directories(头文件所在路径)
 ```
 
+## 制作库文件
+```cmake
+add_library(库名称 STATIC/SHARED 源文件1 [源文件2] ...)
+```
+ - 库名称：分为三部分：lib+库名字+.a/.so，此处只需要指出库的名字就好，剩下的两部分会自动生成
+ - STATIC/SHARE：静态库指定为 STATIC，动态库指定为SHARE
+### 制作静态库
+linux静态库以a结尾，windows静态库以lib结尾
+【例】：我们需要将src下的源文件编译为静态库
+```
+.
+├── CMakeLists.txt
+├── include
+│   └── calculate.hpp
+├── src
+│   └── calculate.cpp
 
+```
+这是cmakeLists.txt文件
+```cmake
+cmake_minimum_required(VERSION 3.16)  
+project(Algorithm_c__)  
+  
+file(GLOB_RECURSE SRC_LIST ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)  
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)  
+  
+add_library(calculate STATIC ${SRC_LIST})
+```
+执行cmake命令，再执行make命令
+```
+cmake ./
+make
+```
+得到静态库libcalculate.a
+### 动态库
+linux动态库以so结尾，windows动态库以dll结尾
+【例】：我们需要将src下的源文件编译为动态库
+```
+.
+├── CMakeLists.txt
+├── include
+│   └── calculate.hpp
+├── src
+│   └── calculate.cpp
+```
+这是cmakeLists.txt文件
+```cmake
+cmake_minimum_required(VERSION 3.16)  
+project(Algorithm_c__)  
+  
+file(GLOB_RECURSE SRC_LIST ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)  
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)  
+  
+add_library(calculate SHARED ${SRC_LIST})
+```
+执行cmake命令，再执行make命令
+```
+cmake ./
+make
+```
+得到动态库libcalculate.so
+### 指定库文件生成路径
+```cmake
+set(LIBRARY_OUTPUT_PATH ./build/)
+```
 
+## 使用库文件
