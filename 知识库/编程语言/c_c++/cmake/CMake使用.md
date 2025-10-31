@@ -41,7 +41,7 @@ add_executable(可执行程序名称 源文件名称...)
 | --------------------------------- | ------------------------------------- |
 | **CMAKE_SOURCE_DIR**              | **项目根目录的路径**                          |
 | CMAKE_BINARY_DIR                  | 二进制文件目录的路径                            |
-| CMAKE_CURRENT_SOURCE_DIR          | 当前处理的 CMakeLists.txt 文件所在的目录          |
+| **CMAKE_CURRENT_SOURCE_DIR**          | **当前处理的 CMakeLists.txt 文件所在的目录**          |
 | CMAKE_CURRENT_BINARY_DIR          | 与 CMAKE_CURRENT_SOURCE_DIR 对应的二进制文件目录 |
 | CMAKE_MODULE_PATH                 | 指定查找 CMake 模块的路径                      |
 | CMAKE_C_COMPILER                  | C 编译器的路径                              |
