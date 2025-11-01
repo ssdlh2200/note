@@ -1,22 +1,20 @@
 # C
 ## 基础类型
-| **<font style="color:rgb(255, 255, 255);">类型</font>** | **<font style="color:rgb(255, 255, 255);">存储大小</font>** | **<font style="color:rgb(255, 255, 255);">值范围</font>** |
-| --- | --- | --- |
-| **char** | 1 字节 | -128 到 127 |
-| **unsigned char** | 1 字节 | 0 到 255 |
-| **signed char** | 1 字节 | -128 到 127 |
-| **<font style="color:rgb(51, 51, 51);">int</font>** | <font style="color:rgb(51, 51, 51);">4 字节（大多数）</font> | <font style="color:rgb(51, 51, 51);">-32,768 到 32,767 或 -2,147,483,648 到 2,147,483,647</font> |
-| **<font style="color:rgb(51, 51, 51);">unsigned int</font>** | <font style="color:rgb(51, 51, 51);">4 字节（大多数）</font> | <font style="color:rgb(51, 51, 51);">0 到 65,535 或 0 到 4,294,967,295</font> |
-| **<font style="color:rgb(51, 51, 51);">short</font>** | <font style="color:rgb(51, 51, 51);">2 字节</font> | <font style="color:rgb(51, 51, 51);">-32,768 到 32,767</font> |
-| **<font style="color:rgb(51, 51, 51);">unsigned short</font>** | <font style="color:rgb(51, 51, 51);">2 字节</font> | <font style="color:rgb(51, 51, 51);">0 到 65,535</font> |
-| **<font style="color:rgb(51, 51, 51);">long（也叫long int）</font>** | <font style="color:rgb(51, 51, 51);">4 字节</font> | <font style="color:rgb(51, 51, 51);">-9223372036854775808 到 9223372036854775807</font> |
-| **<font style="color:rgb(51, 51, 51);">unsigned long</font>** | <font style="color:rgb(51, 51, 51);">4 字节</font> | <font style="color:rgb(51, 51, 51);">0 到 18446744073709551615</font> |
 
+| 类型                                                               | 存储大小                                                  | 值范围                                                                                           |
+| ---------------------------------------------------------------- | ----------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| **char**                                                         | 1 字节                                                  | -128 到 127                                                                                    |
+| **unsigned char**                                                | 1 字节                                                  | 0 到 255                                                                                       |
+| **signed char**                                                  | 1 字节                                                  | -128 到 127                                                                                    |
+| **<font style="color:rgb(51, 51, 51);">int</font>**              | <font style="color:rgb(51, 51, 51);">4 字节（大多数）</font> | <font style="color:rgb(51, 51, 51);">-32,768 到 32,767 或 -2,147,483,648 到 2,147,483,647</font> |
+| **<font style="color:rgb(51, 51, 51);">unsigned int</font>**     | <font style="color:rgb(51, 51, 51);">4 字节（大多数）</font> | <font style="color:rgb(51, 51, 51);">0 到 65,535 或 0 到 4,294,967,295</font>                    |
+| **<font style="color:rgb(51, 51, 51);">short</font>**            | <font style="color:rgb(51, 51, 51);">2 字节</font>      | <font style="color:rgb(51, 51, 51);">-32,768 到 32,767</font>                                  |
+| **<font style="color:rgb(51, 51, 51);">unsigned short</font>**   | <font style="color:rgb(51, 51, 51);">2 字节</font>      | <font style="color:rgb(51, 51, 51);">0 到 65,535</font>                                        |
+| **<font style="color:rgb(51, 51, 51);">long（也叫long int）</font>** | <font style="color:rgb(51, 51, 51);">4 字节</font>      | <font style="color:rgb(51, 51, 51);">-9223372036854775808 到 9223372036854775807</font>        |
+| **<font style="color:rgb(51, 51, 51);">unsigned long</font>**    | <font style="color:rgb(51, 51, 51);">4 字节</font>      | <font style="color:rgb(51, 51, 51);">0 到 18446744073709551615</font>                          |
 
-> <font style="color:rgb(51, 51, 51);">不同操作系统上的类型可能会有差异，为了得到某个类型或某个变量在特定平台上的准确大小，可以使用 </font>**<font style="color:rgb(51, 51, 51);">sizeof</font>**<font style="color:rgb(51, 51, 51);"> 运算符。表达式 </font>_**<font style="color:rgb(51, 51, 51);">sizeof(type)</font>**_<font style="color:rgb(51, 51, 51);"> 得到对象或类型的存储字节大小。下面的实例演示了获取 int 类型的大小：</font>
->
-
-```cmake
+> 不同操作系统上的类型可能会有差异，为了得到某个类型或某个变量在特定平台上的准确大小，可以使用sizeof运算符。表达式sizeof(type)得到对象或类型的存储字节大小。下面的实例演示了获取 int 类型的大小：
+```c
 #include <stdio.h>
 
 int main(void)
@@ -40,7 +38,7 @@ char 通常用来表示字符，但也可以用来处理较小的整数值
 + `char` 在大多数编译器中默认是有符号类型（`signed char`），范围是 -128 到 127
 + 如果需要表示更大的正整数，可以使用 `unsigned char`，范围是 0 到 255
 
-```cmake
+```c
 char          num1 = 0xff;
 signed char   num2 = 0xff;
 unsigned char num3 = 0xff;
@@ -63,7 +61,7 @@ num3:255
 + char str[] = "hello"   表示在动态变量区开辟一个能连续存放6字节的字符串数组，str是数组名称，其数组内容可以被修改，定义在函数中因为是局部变量不能return
 
 ### int
-```cmake
+```c
 int          num0 = 0xffffffff; //-1补码，1首位为1，剩下位取反
 unsigned int num1 = 0xffffffff; //1111 1111 1111 1111 1111 1111 1111 1111
 int          num2 = 0x7fffffff; //0111 1111 1111 1111 1111 1111 1111 1111
@@ -82,7 +80,7 @@ printf("%d\n", num2);
 ```
 
 ### short
-```cmake
+```c
 short          num0 = 0xffff;
 unsigned short num1 = 0xffff;
 
@@ -98,8 +96,9 @@ printf("%d\n", num1);
 ```
 
 ### long
-```cmake
+```c
 // 0x7fffffffffffffff => 0111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111 1111
+
 long int          num0 = 0x7fffffffffffffff;
 long              num1 = 0x7fffffffffffffff;
 unsigned long     num2 = 0xffffffffffffffff;
