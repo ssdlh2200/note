@@ -1,6 +1,6 @@
 # Thread、Runnable
 ## 1. Thread、Runnbale
-### 1. 设计理念
+### 设计理念
 ```java
 public interface Runnable {
 	public abstract void run();
@@ -13,7 +13,7 @@ public class Thread implements Runnable {
 **关注点分离**：Thread 类实现 Runnable 接口，体现了 "关注点分离" 的原则
 + Thread 类负责线程的生命周期管理（如启动、停止等）
 + Runnable 接口负责定义任务的内容，通过实现 Runnable 接口，Thread 类可以更加专注于它的线程控制职责，而无需关心具体的任务逻辑
-### 2. 创建线程
+### 创建线程
 + **方法一：** 继承Thread类重写run()方法（代码采用了匿名内部类写法）
 ```java
 Thread t0 = new Thread("t0"){
@@ -56,7 +56,7 @@ pool.submit(() -> {
     System.out.println("线程池执行任务");  
 });
 ```
-### 3. run与start区别
+### run与start区别
 1. **定义方法关键字不同**
 <span>&emsp;&emsp;</span>run方法是Thread类中的一个普通方法，里面可以重写线程中实际运行的代码
 <span>&emsp;&emsp;</span>start() 方法中调用start0() 方法，而start0方法用native关键字修饰，用来启动一个新的线程，并在新的线程中调用run方法
@@ -180,8 +180,9 @@ static void terminatedState() throws InterruptedException {
 ```
 参考链接
 + [https://blog.csdn.net/x541211190/article/details/109425645](https://blog.csdn.net/x541211190/article/details/109425645)
-+ [https://www.cnblogs.com/muzhongjiang/p/15134397.html](https://www.cnblogs.com/muzhongjiang/p/15134397.html)（莫名其妙的，紧跟着标题就无法显示5.2的标题）
-### 5.2 常用方法
++ [https://www.cnblogs.com/muzhongjiang/p/15134397.html](https://www.cnblogs.com/muzhongjiang/p/15134397.html)（莫名其妙的，紧跟着标题就无法显示的标题）
+
+### 常用方法
 #### start：启动线程
 start()方法用于开启线程，start方法只是让线程进入就绪，里面的代码不一定立刻运行（CPU时间片还没有分配给它），每个线程start()方法只能调用一次，调用了多次会出现 IllegalThreadException
 ```java
@@ -276,11 +277,13 @@ t1.setPriority(0);//设置优先级范围（1-10），效果不明显，主要�
 t1.isAlive();//当前线程是否存活（还没有运行完毕）
 ```
 ### wait/notify、Monitor
-#### 简单使用
+#### 休眠、唤醒线程
 ```java
 /*
 ❌❌❌❌
-主线程不算持有lock锁（owner线程不是主线程），所以无法调用notify方法
+JVM规定只有当monitor的onwer为当前线程，才能够调用notify方法
+monitor.owner != main线程
+此规定时为了防止其他线程任意修改另外一个锁的waitset
 */
 public static void main(String[] args) throws InterruptedException {
     Object lock = new Object();
@@ -296,143 +299,71 @@ public static void main(String[] args) throws InterruptedException {
     t1.start();
     Thread.sleep(500);
     lock.notify();
-
 }
 
 /*
 ✔️✔️✔️✔️
-主线程持有lock锁（owner线程是主线程），可以调用notify方法
+monitor.owner == main线程
+可以调用notify方法
 */
-public static void main(String[] args) throws InterruptedException {
-    Object lock = new Object();
-    Thread t1 = new Thread(() -> {
-        synchronized (lock) {
-            try {
-                log.info("t1进入waiting状态");
-                lock.wait();
-                log.info("t1结束等待");
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }, "t1");
-    t1.start();
-    Thread.sleep(500);
-    synchronized (lock){ // 调用wait()方法时会释放锁，所以我们才能够再次持有锁
-        log.info("开始唤醒");
-        lock.notify();
-        log.info("唤醒结束");
-
-    }
+public static void main(String[] args) throws InterruptedException {  
+    Object lock = new Object();  
+    Thread t1 = new Thread(() -> {  
+        synchronized (lock) {  
+            try {  
+                System.out.println("t1线程进入waitset等待被唤醒，线程状态被设置为waiting");  
+                lock.wait(); //调用wait方法，lock自动膨胀为重量级锁  
+                System.out.println("t1线程被唤醒");  
+            } catch (InterruptedException e) {  
+                throw new RuntimeException(e);  
+            }  
+        }  
+    }, "t1");  
+    t1.start();  
+    Thread.sleep(500);  
+  
+    synchronized (lock){ //调用wait()方法时会释放锁，所以我们才能够再次持有锁
+      
+        System.out.println("主线程唤醒waitset中的线程");  
+        lock.notify();  
+        System.out.println("唤醒结束");  
+    }  
 }
 ```
-上面代码中，**<font style="color:#DF2A3F;">线程持有lock锁后（就是monitor中owner为当前线程）</font>**，才能调用wait，notify，notifyAll方法
-+ **lock.wait()：**持有锁的线程进入到lock监视器waitSet等待
-+ **lock.notify()：**在monitor中waitSet等待的线程中挑一个唤醒
-+ **lock.notifuAll()：**waitSet等待的线程全部唤醒
-#### notify()唤醒线程
-```java
-Object lock = new Object();
+上面代码中，**<font style="color:#DF2A3F;">只有当线程持有lock锁后（就是monitor中owner为当前线程）</font>**，才能调用wait，notify，notifyAll方法
++ lock.wait()：持有锁的线程进入到lock监视器waitSet等待
++ lock.notify()：在monitor中waitSet等待的线程中随机挑选一个唤醒
++ lock.notifuAll()：waitSet等待的线程全部唤醒
+#### 休眠、唤醒原理
 
-Thread t0 = new Thread(() -> {
-    synchronized (lock) {
-        try {
-            log.info("t0 线程阻塞，释放锁");
-            lock.wait();
-            log.info("t0被唤醒");
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-    }
-}, "t0");
-Thread t1 = new Thread(() -> {
-    synchronized (lock) {
-        try {
-            log.info("t1 线程阻塞，释放锁");
-            lock.wait();
-            log.info("t1被唤醒");
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-    }
-}, "t1");
-Thread t2 = new Thread(() -> {
-    synchronized (lock) {
-        try {
-            log.info("t2 线程阻塞，释放锁");
-            lock.wait();
-            log.info("t2被唤醒");
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-    }
-}, "t2");
-
-t0.start();
-t1.start();
-t2.start();
-Thread.sleep(1000);
-
-//让主线程持有锁后才能唤醒waitingSet中的线程
-synchronized (lock){
-    log.info("唤醒线程");
-    lock.notify();
-    lock.notify();
-}
-```
-运行结果
-```java
-2024-09-04 15:20:18.696 [t0] [INFO ] - t0 线程阻塞，释放锁
-2024-09-04 15:20:18.700 [t2] [INFO ] - t2 线程阻塞，释放锁
-2024-09-04 15:20:18.700 [t1] [INFO ] - t1 线程阻塞，释放锁
-2024-09-04 15:20:19.699 [main] [INFO ] - 唤醒线程
-2024-09-04 15:20:19.699 [t0] [INFO ] - t0被唤醒
-2024-09-04 15:20:19.699 [t2] [INFO ] - t2被唤醒
-```
-+ notify()，无法唤醒指定线程
-+ <font style="color:rgb(34, 34, 34);">唤醒线程的顺序取决于jvm厂商，一般都是顺序唤醒</font>
-#### 原理
 ![](https://cdn.nlark.com/yuque/0/2024/png/33704534/1709733378688-ab94f4bd-7dc4-4594-834d-33061bf67a6b.png)
 
-+ Java对象可以关联一个**Monitor**对象
-+ 我们使用**synchronized**给对象上锁，当这对象锁升级为**重量级锁**之后，对象头中的mark word就会成为指向一个**Monitor**的指针
+**synchronized**给对象上锁，当这对象锁升级为**重量级锁**之后，object header中的mark word就会成为指向一个**Monitor**的指针
 
 ```java
-|---------|
-| Monitor |
-|---------|
-| WaitSet | 
-|EntryList| 
-|  Owner  |
-|---------|
-
 假设线程A启动,执行到 synchronized 同步代码块时（假设此时锁已经升级为重量级锁）
 对象锁的 mark word 会变为如下：
-|---------------------|------------|-----------------------|------|--------------------|
-|               prt_to_heavyweight_monitor:30              |  10  | Heavyweight Locked |
-|---------------------|------------|-----------------------|------|--------------------|
-lock此时会成为指向monitor的地址指针
-
-Owner ---》 A线程
+|--------------------------------|------|
+|  prt_to_heavyweight_monitor:30 |  10  |
+|--------------------------------|------|
+Owner ---> A线程
 
 当其它线程同样获取lock对象锁时,发现已经有指向的monitor,
 便去查找Owner是否有线程,如果有,则线程进入EntryList等待Owner释放
 (线程进入EntryList则线程状态显示为BLOCKED)
-
-monitor锁的实现在JVM内部没有暴露API给Java层面
 ```
 
 + 由上可知Monitor对象中分为中有三个概念：
-    1. **<font style="color:rgb(13, 13, 13);">WaitSet</font>**：一个线程等待集合，存放因为调用对象锁的wait方法而进入等待的线程。
-        1. 如果调用的是无参的**wait()**方法，线程会进入**WAITING**状态，此状态下的线程一直等待直到其它线程唤醒
-        2. 如果调用的是传入时间参数的**wait(long timeout)**方法，线程会进入**TIMED-WAITING**状态，此状态的线程超时自动进入entryList。
-        3. 当我们调用**notify()**时，将随机唤起一个waitset中的线程进入entryList，当我们调用**<font style="color:rgb(13, 13, 13);">notifyAll()</font>**时，将唤起waitset中的所有线程进入entryList
-    2. **<font style="color:rgb(13, 13, 13);">EntryList：</font>**<font style="color:rgb(13, 13, 13);">一个存放等待获取对象锁的线程的列表</font>
-        * EntryList<font style="color:rgb(13, 13, 13);"> 中的线程处于阻塞状态（</font>**<font style="color:rgb(13, 13, 13);">BLOCKED</font>**<font style="color:rgb(13, 13, 13);">），EntryList 中的线程竞争获取锁。</font>
-    3. **<font style="color:rgb(13, 13, 13);">Owner：</font>**<font style="color:rgb(13, 13, 13);">当前持有对象锁的线程。</font>
+    1. **WaitSet**：线程等待集合，存放调用锁的wait()进入等待集合的线程或者获取不到锁的线程。
+        - 调用wait()，线程进入WAITING状态，此状态下的线程一直等待直到其它线程唤醒。
+        - 调用wait(long timeout)，线程进入TIMED-WAITING状态，此状态的线程超时自动进入entryList。
+        - 调用notify()时，随机唤起一个waitset中的线程进入entryList
+        - 当我们调用notifyAll()时，将唤起waitset中的所有线程进入entryList。
+    2. **EntryList**：一个存放等待获取对象锁的线程的列表。
+        * EntryList中的线程处于阻塞状态（BLOCKED），EntryList 中的线程竞争获取锁。
+    3. **Owner**：当前持有对象锁的线程。
 
 #### Thread.sleep() 和 Object#wait() 区别
-**行为上区别**
 + Object.wait()之后
     - 把当前线程移到wait set里
     - 释放掉object monitor（释放掉锁）
