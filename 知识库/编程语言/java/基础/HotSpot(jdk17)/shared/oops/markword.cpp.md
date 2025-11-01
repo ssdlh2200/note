@@ -40,6 +40,7 @@ unused: 25 | hash: 31 | unused_gap: 1 | age: 4 | biased_lock: 1 | lock: 2
 
 JavaThread*: 54 | epoch: 2 | unused_gap: 1 | age: 4 | biased_lock: 1 | lock: 2
 ```
+<font color="#c00000">jdk17废除偏向锁</font>
 偏向锁模式用于把锁偏向某个线程，低3位表示锁状态
 - 锁可以偏向某个特定线程，也可以匿名偏向，表示锁有可能偏向某线程
 - 当锁偏向某线程时，该线程可以直接加锁和解锁， 无需使用原子操作
@@ -58,5 +59,5 @@ JavaThread*: 54 | epoch: 2 | unused_gap: 1 | age: 4 | biased_lock: 1 | lock: 2
 [ptr             | 10]  monitor   重量级锁，对象头被替换
 [ptr             | 11]  marked    对象被标记回收
 [0 ............ 0| 00]  inflating 锁膨胀中（正在创建重量级锁）
-
 ```
+

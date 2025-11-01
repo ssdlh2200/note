@@ -275,7 +275,7 @@ t1.getPriority();//获得优先级
 t1.setPriority(0);//设置优先级范围（1-10），效果不明显，主要还是由操作系统来决定
 t1.isAlive();//当前线程是否存活（还没有运行完毕）
 ```
-### wait/notify通知机制、Monitor监视器
+### wait/notify、Monitor
 #### 简单使用
 ```java
 /*
@@ -287,7 +287,7 @@ public static void main(String[] args) throws InterruptedException {
     Thread t1 = new Thread(() -> {
         synchronized (lock) {
             try {
-                lock.wait();
+                lock.wait(); 
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }

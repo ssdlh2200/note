@@ -17,31 +17,28 @@
     - 如果没有，则线程成为新的Owner（失败则继续进入EntryList）
 下面打印lock的对象头
 ```java
-
-final Object lock = new Object();  
-System.out.println(ClassLayout.parseInstance(lock).toPrintable());  
-
-new Thread(() -> {  
-    synchronized (lock) {  
-        System.out.println(ClassLayout.parseInstance(lock).toPrintable());  
-        try {  
-            Thread.sleep(2000);  
-        } catch (InterruptedException e) {  
-            throw new RuntimeException(e);  
+public static void main(String[] args) throws InterruptedException {  
+    final Object lock = new Object();  
+    System.out.println(ClassLayout.parseInstance(lock).toPrintable());  
+    new Thread(() -> {  
+        synchronized (lock) {  
+            System.out.println(ClassLayout.parseInstance(lock).toPrintable()); 
+            try {  
+                Thread.sleep(2000);  
+            } catch (InterruptedException e) {  
+                throw new RuntimeException(e);  
+            }  
         }  
-    }  
-
-}).start(); 
- 
-new Thread(() -> {
-    //等待锁的释放
-    synchronized (lock) {  
-        System.out.println(ClassLayout.parseInstance(lock).toPrintable());  
-    }  
-
-}).start();  
+  
+    }).start();  
+    new Thread(() -> {  
+        synchronized (lock) {  
+            System.out.println(ClassLayout.parseInstance(lock).toPrintable());  
+        }  
+    }).start();  
+}
 ```
-运行结果
+运行结果（jdk17废弃偏向锁，所以是non-biasable）
 ```
 (object header: mark)     0x0000000000000001 (non-biasable; age: 0)
 (object header: mark)     0x000000edae7ff400 (thin lock: 0x000000edae7ff400)
