@@ -34,4 +34,4 @@ private:
 };
 ```
 我们可以看到对象包含一个markWord和一个类指针
-
+[[typedef]]
