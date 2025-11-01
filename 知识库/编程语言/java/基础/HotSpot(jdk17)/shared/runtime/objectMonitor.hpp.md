@@ -38,7 +38,7 @@ public static void main(String[] args) throws InterruptedException {
     }).start();  
 }
 ```
-运行结果（jdk17废弃偏向锁，所以是non-biasable）
+运行结果（jdk17废弃偏向锁，所以是non-biasable禁用偏向锁）
 ```
 (object header: mark)     0x0000000000000001 (non-biasable; age: 0)
 (object header: mark)     0x000000edae7ff400 (thin lock: 0x000000edae7ff400)
