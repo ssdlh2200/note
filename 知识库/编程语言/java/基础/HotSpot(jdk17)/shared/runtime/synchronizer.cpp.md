@@ -1,4 +1,5 @@
 # synchronizer
+
 ## wait方法
 wait方法使得线程进入waitset中等待唤醒
 ```cpp
