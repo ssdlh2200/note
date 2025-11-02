@@ -9,10 +9,15 @@
 ```
 -XX:+UnlockDiagnosticVMOptions 
 -XX:+PrintAssembly
+-XX:CompileCommand=compileonly,TestVolatile2.main
 -XX:+LogCompilation 
--XX:hotspot.log
+-XX:LogFile=./hotspot.log
 ```
+注意：-XX:CompileCommand=compileonly,TestVolatile2.main只会将TestVolatile2.main编译为汇编码
 
+打开VM options
+![[20251102-17-49-41.png]]
+![[20251102-17-50-41.png]]
 ## 4. 配置config
 配置生成 `hotspot.log` 日志的 java 文件所在的 `src` 文件目录和 `class` 文件目录
 ![[20251102-14-30-51.png]]
