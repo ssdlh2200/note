@@ -24,3 +24,18 @@
 
 配置完成之后，点击 Open Log 按钮，选中 hotspot.log 文件，然后点击 Start 按钮，如果配置正确的话，会得到如下结果：
 ![[20251102-14-31-01.png]]
+
+## 5. 注意
+java代码不能太简单否则不能被jit优化为机器码执行
+```java
+public class TestVolatile2 {  
+    static int data = 0;  
+    static volatile boolean ready = false;  
+    public static void main(String[] args) {  
+        for (int i = 0; i < 10000; i++) {  
+            data = 42; // 普通写  
+            ready = true; //volatile写  
+        }  
+    }  
+}
+```
