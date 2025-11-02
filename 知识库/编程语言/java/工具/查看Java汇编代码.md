@@ -3,15 +3,13 @@
 ![[20251102-14-52-39.png]]
 ## 2. 验证是否安装成功
 - java -XX:+UnlockDiagnosticVMOptions -XX:+PrintAssembly -version
-
+![[20251102-16-14-38.png]]
 ## 3. 添加运行参数
 ```
 -XX:+UnlockDiagnosticVMOptions 
 -XX:+PrintAssembly
--XX:CompileCommand=compileonly,*TestVolatile2.main
 -XX:+LogCompilation 
 -XX:hotspot.log
-
 ```
 
 ## 4. 配置config
