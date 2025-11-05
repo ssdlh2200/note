@@ -60,8 +60,8 @@ end
 ```
 - add al bl 若其中al溢出，那么是否会存储到ah中?
 - 不会
-
-
+### jmp
+在8086中，jmp指令将直接修改CS、IP的值
 
 ## L
 ### lock
