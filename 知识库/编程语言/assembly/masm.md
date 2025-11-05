@@ -13,25 +13,42 @@
     - 操作数（Operand）
     - 注释（以 `;` 开头）
 
-
+#### 伪指令
 ```asm
 assume cs:hello
-
 hello segment
+
     mov ax, 18H   ;推荐使用16进制方便查看寄存器内的值
-    mov ax, ac00h
+    
+    mov ax, ac00h ;将程序控制权交换给dos
     int 21h       ;相当于c语言中return 0
+    
 hello ends
 
 end
 ```
-
-#### assume
-assume时masm提供的伪指令
+其中
+```
+assume cs:hello
+hello segment
+    ...
+    ...
+    ...
+hello ends
+end
+```
+其中assume、segment、ends、end都是伪指令，伪指令只会由编译器识别
 - 不会生成机器机器码
 - 不会修改CPU寄存器
 - 只在汇编阶段有效
-#### segment（段定义）
+MASM 伪指令主要分为：
+1. **段相关**：SEGMENT, ENDS, ASSUME, ORG, GROUP
+2. **数据定义**：DB, DW, DD, DQ, DT, DUP
+3. **程序控制**：END, PROC/ENDP, MACRO/ENDM, INCLUDE, TITLE
+4. **结构类型**：STRUC/ENDSTRUC, FIELD, TYPEDEF, EQU, SET
+5. **条件汇编**：IF/ELSE/ENDIF, IFDEF/IFNDEF
+6. **辅助/符号**：PUBLIC, EXTRN, ALIGN, OPTION
+##### segment（段定义）
 一个汇编程序由多个段组成，这些段通常用来存放代码、数据或者当作栈空间使用
 每个段都需要一个段名
 ```asm
@@ -39,6 +56,61 @@ assume时masm提供的伪指令
 ....
 段名 ends
 ```
+
+##### assume（假设）
+assume时masm提供的伪指令
+```
+assume ds:SsdlhData
+assume cs:SsdlhCode
+
+SsdlhData segment
+    a DB 11h
+    b DB 22h
+    c DB 33h
+SsdlhData ends
+
+SsdlhCode segment
+MAIN:
+    mov ax, SsdlhData ;初始化 DS
+    mov ds, ax        ;a b c都可以通过[DS:偏移]访问了
+    
+    mov ax, a
+    mov bx, b
+    mov cx, c
+    
+    mov ah, 4ch ;相等于return 0
+    int 21h
+SsdlhCode ends
+
+end MAIN
+```
+当我们访问变量时
+```
+mov ax, SsdlhData ;会把SsdlhData翻译成16位的值
+mov AL, a ; 汇编会生成[ds:a]
+```
+##### end
+如果没有end，默认从第一条指令开始执行
+```
+MAIN:                ; 入口标签
+    MOV AX, 4C00h
+    INT 21h
+END MAIN              ; 入口标签指定给 END
+```
+
+```
+START:                ; 入口标签
+    MOV AX, 4C00h
+    INT 21h
+END START              ; 入口标签指定给 END
+```
+##### db、dw、dd、dq
+| 指令   | 英文                | 含义         | 占用字节 |
+| ---- | ----------------- | ---------- | ---- |
+| `DB` | Define Byte       | 定义字节       | 1    |
+| `DW` | Define Word       | 定义字（16 位）  | 2    |
+| `DD` | Define Doubleword | 定义双字（32 位） | 4    |
+| `DQ` | Define Quadword   | 定义四字（64 位） | 8    |
 
 ### masm
 ```asm

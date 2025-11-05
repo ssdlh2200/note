@@ -59,13 +59,43 @@ end
 ```
 - add al bl 若其中al溢出，那么是否会存储到ah中?
 - 不会
-### jmp
+
+### 流程转移指令
+#### jmp
 - 同时修改CS、IP的内容
     - jmp 段地址:偏移地址
 - 仅修改IP的内容
     - jmp ax（类似于mov IP, ax）
+#### call
+call属于流程转移指令，会修改IP，或者同时修改CS、IP
+CPU指向call指令
+- 将当前的IP或者CS和IP压入栈
+- 转移到标号处执行指令
+```asm
+assume cs:codeSeg
+codeSeg segment
 
-### call
+main:
+
+    mov ax, 1234h
+
+    call s
+
+    mov ax, 4c00h
+    int 21h
+
+s:  add ax, 1h
+    ret
+
+codeSeg ends
+end main
+```
+以冒号 **:** 结尾的都是一个标签，标记某条指令的地址，汇编器在生成机器码时会给 **s** 分配一个地址
+- 我们可以看到S被汇编器翻译成地址
+![[20251106-00-54-59.png]]
+- 我们可以看到IP新的偏移地址，栈顶偏移地址的变化
+![[20251106-00-57-13.png]]
+
 
 
 
