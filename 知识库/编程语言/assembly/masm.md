@@ -12,6 +12,8 @@
     - 指令（Instruction）
     - 操作数（Operand）
     - 注释（以 `;` 开头）
+
+
 ```asm
 assume cs:hello
 
@@ -23,6 +25,12 @@ hello ends
 
 end
 ```
+
+#### assume
+assume时masm提供的伪指令
+- 不会生成机器机器码
+- 不会修改CPU寄存器
+- 只在汇编阶段有效
 #### segment（段定义）
 一个汇编程序由多个段组成，这些段通常用来存放代码、数据或者当作栈空间使用
 每个段都需要一个段名
