@@ -34,7 +34,7 @@
 段地址 = 073F
 偏移地址 = 0100
 真实地址 = 
-        073Fh * 10h = 073F0h
+        073Fh  * 10h   = 073F0h
         073F0h + 0100h = 074F0h
 ```
 
@@ -171,7 +171,6 @@ debug是dos下的调试程序，可以查看CPU寄存器、内存的情况
 | **T** | **单步执行**一条机器指令        | 调试程序，逐条执行机器指令并观察结果          |
 | **Q** | 退出debug模式             |                             |
 
-
 -  r命令
 ![[20251105-15-05-04.png]]
 - d命令
@@ -228,57 +227,69 @@ ret          ;返回
 ```c
 #include <stdio.h>  
 int add(int a, int b){ return a + b; }  
-int sub(int a, int b){ return a - b; } 
+int foo(int a, int b){  
+    return add(a, b);  
+}  
 int main()  
 {  
     int x = 10;  
     int y = 5;  
-    int r1 = add(x, y);  
-    int r2 = sub(x, y);  
-    printf("r1 = %d, r2 = %d", r1, r2);  
+    int r1 = foo(x, y);  
+    printf("r1 = %d\n", r1);  
 }
 ```
-反汇编代码如下：
+调用foo方法前后，反汇编代码如下：
 ```
-00007FF698E3165A | push rbp                           |
-00007FF698E3165B | mov rbp,rsp                        |
-00007FF698E3165E | sub rsp,30                         |
-00007FF698E31662 | call index.7FF698E31777            | 调用main方法
-00007FF698E31667 | mov dword ptr ss:[rbp-4],A         | 0A:'\n'
-00007FF698E3166E | mov dword ptr ss:[rbp-8],5         |
-00007FF698E31675 | mov edx,dword ptr ss:[rbp-8]       |
-00007FF698E31678 | mov eax,dword ptr ss:[rbp-4]       |
-00007FF698E3167B | mov ecx,eax                        |
-00007FF698E3167D | call index.7FF698E31634            | 调用add方法
-00007FF698E31682 | mov dword ptr ss:[rbp-C],eax       |
-00007FF698E31685 | mov edx,dword ptr ss:[rbp-8]       |
-00007FF698E31688 | mov eax,dword ptr ss:[rbp-4]       |
-00007FF698E3168B | mov ecx,eax                        |
-00007FF698E3168D | call index.7FF698E31648            | 调用sub方法
-00007FF698E31692 | mov dword ptr ss:[rbp-10],eax      |
-00007FF698E31695 | mov edx,dword ptr ss:[rbp-10]      |
-00007FF698E31698 | mov eax,dword ptr ss:[rbp-C]       |
-00007FF698E3169B | mov r8d,edx                        |
-00007FF698E3169E | mov edx,eax                        |
-00007FF698E316A0 | lea rax,qword ptr ds:[7FF698E3B000 | 00007FF698E3B000:"r1 = %d, r2 = %d"
-00007FF698E316A7 | mov rcx,rax                        |
-00007FF698E316AA | call index.7FF698E315E0            |
-00007FF698E316AF | mov eax,0                          |
-00007FF698E316B4 | add rsp,30                         |
-00007FF698E316B8 | pop rbp                            |
+00007FF617F1168C | call index.7FF617F11648            | 调用add方法
+00007FF617F11691 | mov dword ptr ss:[rbp-C],eax       |
 ```
 
-1. 调用add方法前后的的反汇编查看寄存器如下：
+1. 调用call前后寄存器变化如下：
 ```asm
-; 调用call前：rbp = 000000F5375FF810
-; 调用call前：rsp = 000000F5375FF7E0
+; 调用call前：rbp = 000000D7B19FF9F0
+; 调用call前：rsp = 000000D7B19FF9C0
 
-call index.7FF698E31634
+00007FF617F1168C | call index.7FF617F11648            | 调用add方法
 
-; 调用call后：rbp = 000000F5375FF810
-; 调用call后：rsp = 000000F5375FF7D8
+; 调用call后：rbp = 000000D7B19FF9F0
+; 调用call后：rsp = 000000D7B19FF9B8
 
+; call将函数应该返回的地址压入栈，也就是00007FF617F11691入栈
 ```
+2. 进入到add方法后，反汇编内容如下：
+```asm
+;将函数调用者的栈基指针入栈，此时rsp应该再向下移动8个字节
+00007FF617F11648 | push rbp                           |
+;rsp = 000000D7B19FF9B0
+
+;将函数应该返回的地址作为新的栈基指针
+00007FF617F11649 | mov rbp,rsp                        |
+
+;栈指针向下移动0x20也就是32个字节
+00007FF617F1164C | sub rsp,20                         |
+;rsp = 000000D7B19FF990
+
+;保存参数1
+00007FF617F11650 | mov dword ptr ss:[rbp+10],ecx      |
+;保存参数2
+00007FF617F11653 | mov dword ptr ss:[rbp+18],edx      |
+
+00007FF617F11656 | mov edx,dword ptr ss:[rbp+18]      |
+00007FF617F11659 | mov eax,dword ptr ss:[rbp+10]      |
+00007FF617F1165C | mov ecx,eax                        |
+
+00007FF617F1165E | call index.7FF617F11634            |
+
+;回收局部变量
+00007FF617F11663 | add rsp,20                         |
+00007FF617F11667 | pop rbp                            |
+
+;从栈中弹出返回地址
+00007FF617F11668 | ret                                |
+```
+- 下面是示意图
+![[20251106-11-54-47.drawio]]
+
 
 #### RSP
 栈指针寄存器
