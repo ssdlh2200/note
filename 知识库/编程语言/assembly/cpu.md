@@ -201,6 +201,89 @@ debug是dos下的调试程序，可以查看CPU寄存器、内存的情况
 
 ## 现代CPU
 ### 寄存器
+#### RBP、EBP、BP
+Base Pointer（栈基指针），是函数调用和栈帧管理的重要寄存器
+**栈帧中RBP的作用**
+在函数调用中，通常会建立栈帧（stack frame）
+```asm
+push rbp     ;保存调用者的基指针
+mov rbp, rsp ;建立当前函数的栈基指针
+sub rsp, X   ;为局部变量分配空间
+```
+在函数结束时
+```
+mov rsp, rbp ;恢复栈顶位置
+pop rbp      ;恢复调用者rbp
+ret          ;返回 
+```
+
+| 指令/操作            | 与 RBP 的关系  |
+| ---------------- | ---------- |
+| push rbp         | 保存调用者的基指针  |
+| mov rbp, rsp     | 建立当前函数栈帧基准 |
+| \[rbp - offset\] | 访问局部变量     |
+| \[rbp + offset\] | 访问函数参数     |
+| pop rbp          | 恢复调用者基指针   |
+【例】下面将分析这个简单的c语言程序
+```c
+#include <stdio.h>  
+int add(int a, int b){ return a + b; }  
+int sub(int a, int b){ return a - b; } 
+int main()  
+{  
+    int x = 10;  
+    int y = 5;  
+    int r1 = add(x, y);  
+    int r2 = sub(x, y);  
+    printf("r1 = %d, r2 = %d", r1, r2);  
+}
+```
+反汇编代码如下：
+```
+00007FF698E3165A | push rbp                           |
+00007FF698E3165B | mov rbp,rsp                        |
+00007FF698E3165E | sub rsp,30                         |
+00007FF698E31662 | call index.7FF698E31777            | 调用main方法
+00007FF698E31667 | mov dword ptr ss:[rbp-4],A         | 0A:'\n'
+00007FF698E3166E | mov dword ptr ss:[rbp-8],5         |
+00007FF698E31675 | mov edx,dword ptr ss:[rbp-8]       |
+00007FF698E31678 | mov eax,dword ptr ss:[rbp-4]       |
+00007FF698E3167B | mov ecx,eax                        |
+00007FF698E3167D | call index.7FF698E31634            | 调用add方法
+00007FF698E31682 | mov dword ptr ss:[rbp-C],eax       |
+00007FF698E31685 | mov edx,dword ptr ss:[rbp-8]       |
+00007FF698E31688 | mov eax,dword ptr ss:[rbp-4]       |
+00007FF698E3168B | mov ecx,eax                        |
+00007FF698E3168D | call index.7FF698E31648            | 调用sub方法
+00007FF698E31692 | mov dword ptr ss:[rbp-10],eax      |
+00007FF698E31695 | mov edx,dword ptr ss:[rbp-10]      |
+00007FF698E31698 | mov eax,dword ptr ss:[rbp-C]       |
+00007FF698E3169B | mov r8d,edx                        |
+00007FF698E3169E | mov edx,eax                        |
+00007FF698E316A0 | lea rax,qword ptr ds:[7FF698E3B000 | 00007FF698E3B000:"r1 = %d, r2 = %d"
+00007FF698E316A7 | mov rcx,rax                        |
+00007FF698E316AA | call index.7FF698E315E0            |
+00007FF698E316AF | mov eax,0                          |
+00007FF698E316B4 | add rsp,30                         |
+00007FF698E316B8 | pop rbp                            |
+```
+
+1. 调用add方法前后的的反汇编查看寄存器如下：
+```asm
+; 调用call前：rbp = 000000F5375FF810
+; 调用call前：rsp = 000000F5375FF7E0
+
+call index.7FF698E31634
+
+; 调用call后：rbp = 000000F5375FF810
+; 调用call后：rsp = 000000F5375FF7D8
+
+```
+
+#### RSP
+栈指针寄存器
+保存栈顶元素的内存地址
+
 #### CS、RIP(EIP、IP)
 
 | 寄存器            | 存放内容                       | 说明   |
