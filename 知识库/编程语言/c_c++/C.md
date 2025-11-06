@@ -6,7 +6,7 @@
 | **char**                                                         | 1 字节                                                  | -128 到 127                                                                                    |
 | **unsigned char**                                                | 1 字节                                                  | 0 到 255                                                                                       |
 | **signed char**                                                  | 1 字节                                                  | -128 到 127                                                                                    |
-| **<font style="color:rgb(51, 51, 51);">int</font>**              | <font style="color:rgb(51, 51, 51);">4 字节（大多数）</font> | <font style="color:rgb(51, 51, 51);">-32,768 到 32,767 或 -2,147,483,648 到 2,147,483,647</font> |
+| int                                                              | <font style="color:rgb(51, 51, 51);">4 字节（大多数）</font> | <font style="color:rgb(51, 51, 51);">-32,768 到 32,767 或 -2,147,483,648 到 2,147,483,647</font> |
 | **<font style="color:rgb(51, 51, 51);">unsigned int</font>**     | <font style="color:rgb(51, 51, 51);">4 字节（大多数）</font> | <font style="color:rgb(51, 51, 51);">0 到 65,535 或 0 到 4,294,967,295</font>                    |
 | **<font style="color:rgb(51, 51, 51);">short</font>**            | <font style="color:rgb(51, 51, 51);">2 字节</font>      | <font style="color:rgb(51, 51, 51);">-32,768 到 32,767</font>                                  |
 | **<font style="color:rgb(51, 51, 51);">unsigned short</font>**   | <font style="color:rgb(51, 51, 51);">2 字节</font>      | <font style="color:rgb(51, 51, 51);">0 到 65,535</font>                                        |
