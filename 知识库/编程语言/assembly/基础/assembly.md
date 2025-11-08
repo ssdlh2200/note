@@ -113,6 +113,42 @@ end main
 ## x86(nams,masm,att)
 ### L
 #### lea
+```asm
+lea 目的寄存器, 源操作数
+```
+- 目的寄存器：rax，rbx，rcx
+- 源操作数：内存地址表达式（不会访问内存，只计算地址）
+【例1】
+```c
+int a;
+int *p = &a;
+```
+ 汇编
+```
+lea rax, [a]  ;rax = &a
+mov [p], rax  ;p = &a
+```
+【例2】
+```c
+int arr[10];
+int *p = &arr[0] + 3;
+```
+汇编
+```asm
+lea rax, [arr + 3*4]
+mov [p], rax
+```
+
+LEA 支持 x86/x86_64 内存寻址的全部形式：
+```asm
+[base + index*scale + displacement]
+```
+
+- base：基础寄存器（可选）
+- index：索引寄存器（可选）
+- scale：1,2,4,8（可选）
+- displacement：偏移量（可选）
+
 
 
 #### lock
