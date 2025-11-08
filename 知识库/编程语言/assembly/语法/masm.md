@@ -1,6 +1,5 @@
-# masm
-## 5.0版本
-### asm文件格式
+# masm(5.0)
+## asm文件格式
 - 汇编源代码，包括：
     1. 段定义（Segment）
     2. 数据定义（Data）
@@ -13,7 +12,7 @@
     - 操作数（Operand）
     - 注释（以 `;` 开头）
 
-#### 伪指令
+### 伪指令
 ```asm
 assume cs:hello
 hello segment
@@ -48,7 +47,7 @@ MASM 伪指令主要分为：
 4. **结构类型**：STRUC/ENDSTRUC, FIELD, TYPEDEF, EQU, SET
 5. **条件汇编**：IF/ELSE/ENDIF, IFDEF/IFNDEF
 6. **辅助/符号**：PUBLIC, EXTRN, ALIGN, OPTION
-##### segment（段定义）
+#### segment（段定义）
 一个汇编程序由多个段组成，这些段通常用来存放代码、数据或者当作栈空间使用
 每个段都需要一个段名
 ```asm
@@ -57,7 +56,7 @@ MASM 伪指令主要分为：
 段名 ends
 ```
 
-##### assume（假设）
+#### assume（假设）
 assume时masm提供的伪指令
 ```
 assume ds:SsdlhData
@@ -89,7 +88,7 @@ end MAIN
 mov ax, SsdlhData ;会把SsdlhData翻译成16位的值
 mov AL, a ; 汇编会生成[ds:a]
 ```
-##### end
+#### end
 如果没有end，默认从第一条指令开始执行
 ```
 MAIN:                ; 入口标签
@@ -104,7 +103,7 @@ START:                ; 入口标签
     INT 21h
 END START              ; 入口标签指定给 END
 ```
-##### db、dw、dd、dq
+#### db、dw、dd、dq
 | 指令   | 英文                | 含义         | 占用字节 |
 | ---- | ----------------- | ---------- | ---- |
 | `DB` | Define Byte       | 定义字节       | 1    |
@@ -112,7 +111,7 @@ END START              ; 入口标签指定给 END
 | `DD` | Define Doubleword | 定义双字（32 位） | 4    |
 | `DQ` | Define Quadword   | 定义四字（64 位） | 8    |
 
-### masm
+## masm
 ```asm
 masm 汇编源文件.asm
 ```
@@ -126,7 +125,7 @@ masm 汇编源文件.asm
 masm 汇编源文件.asm;
 ```
 
-### link
+## link
 ```asm
 link 生成的OBJ文件.obj
 ```
@@ -140,7 +139,7 @@ link 生成的OBJ文件.obj
 link 生成的OBJ文件.obj;
 ```
 
-### debug
+## debug
 ```asm
 debug 源程序.exe
 ```
