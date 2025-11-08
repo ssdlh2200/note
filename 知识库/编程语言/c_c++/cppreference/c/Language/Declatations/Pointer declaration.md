@@ -32,7 +32,7 @@ mov    QWORD PTR [rbp-0x10],rax   ;p3 = &p2
 1. **指向常量的指针**
 ```c
 int a = 10, b = 20;  
-const int *c_p = &a;  
+const int* c_p = &a;  
 
 //*c_p = 1;  
 //错误，指向的值不能修改  
@@ -45,7 +45,7 @@ a = 1;
 2. **常量指针**
 ```c
 int a = 10, b = 20;  
-int *const c_p = &a;  
+int* const c_p = &a;  
   
   
 *c_p = 1;  
@@ -57,8 +57,8 @@ int *const c_p = &a;
 3. **指向常量指针的指针**
 ```c
 int a = 10;  
-int *const  c_p   = &a;  
-int *const *p_c_p = &c_p;
+int* const  c_p   = &a;  
+int* const* p_c_p = &c_p;
 ```
 ## indirection（间接访问）
 指针用于**间接访问（indirection）**，这是一种普遍存在的编程技术。  
@@ -73,9 +73,9 @@ int *const *p_c_p = &c_p;
 一个对象指针可以用取地址符的结果来初始化，这个操作符作用于一个对象类型的表达式（该类型可以是不完整的）
 1. 基础类型
 ```c
-int n;  
-int *p_n = &n;  
-int *const *p_p_n = &p_n;
+int  n;  
+int* p_n = &n;  
+int* const *p_p_n = &p_n;
 ```
 - p_n指向n
 - p_p_n指向一个const指针，且该const指针又指向一个int
@@ -137,6 +137,30 @@ void (*pf2)(int) = f; // same as &f
 f == &f
 ```
 
-
 ### Pointers to void
 任何类型对象的指针都可以Implicit conversions（隐式）地转换为 void*
+```c
+int n = 1;  
+int* p = &n;   //int*  隐式转换为 void*
+void* pv = p;  //void* 再转换回 int*
+int* p2 = pv;
+
+printf("%d\n", *p2); //输出1
+```
+- void* 是万能指针，可以指向任何类型的数据，但不能直接引用（因为无法得知对象的大小和类型）
+- 必须再使用之前强制类型转换
+- 不能做指针运算，void没有大小
+### Null pointers
+1. 每一种指针类型都有一个特殊的取值，称为该类型的空指针值（null pointer value）
+2. 一个空指针不指向任何对象或函数，使用\*p会导致未定义的行为
+3. 所有相同类型的空指针彼此比较时都相等
+4. **要将一个指针初始化为空（null）或赋值为空，可以使用空指针常量（NULL或者值为0的任意整型常量）**
+```c
+int* p = NULL;     // 用宏 NULL 初始化
+int* q = 0;        // 0 也可以代表空指针常量
+static char* s;    // 静态变量自动初始化为 NULL
+
+int* p = NULL;
+printf("%d", *p);  // ❌ 未定义行为（程序可能崩溃）
+
+```

@@ -350,19 +350,7 @@ num2: 0x7ffdc420f760
 num3: 0x7ffdc420f764
 ```
 
-### 指针数组[https://www.runoob.com/cprogramming/c-array-of-pointers.html](https://www.runoob.com/cprogramming/c-array-of-pointers.html)
-```cmake
-int a = 1, b = 2, c = 3;
-int *arr[3] = {&a, &b, &c};  // 指针数组
 
-for(int i = 0; i < 3; i++) {
-    printf("%d ", *arr[i]);   // 输出每个指针指向的值
-}
-```
-
-### 指向指针的指针[https://www.runoob.com/cprogramming/c-pointer-to-pointer.html](https://www.runoob.com/cprogramming/c-pointer-to-pointer.html)
-### 传递指针给函数[https://www.runoob.com/cprogramming/c-passing-pointers-to-functions.html](https://www.runoob.com/cprogramming/c-passing-pointers-to-functions.html)
-### 从函数返回指针[https://www.runoob.com/cprogramming/c-return-pointer-from-functions.html](https://www.runoob.com/cprogramming/c-return-pointer-from-functions.html)
 ## 关键字
 ### struct
 #### a. 基本用法
