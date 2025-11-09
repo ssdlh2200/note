@@ -54,9 +54,9 @@ Process finished with exit code -1073741819 (0xC0000005)
 
 ### 堆区
 #### 堆创建机制
-程序启动时，操作系统会为程序创建一个或多个堆
-每次调用malloc时，就会将一个heap lock（堆块）分配出去
-
+1. 程序启动时，操作系统会为程序创建一个或多个堆
+2. 每次调用malloc()时，会从现有的堆中分配块(heap lock)
+3. 当堆内存不够时，操作系统将申请增加堆内存
 #### 查看堆内存
 ```c
 int main()  
@@ -82,9 +82,46 @@ int main()
 5. ![[20251109-17-23-42.png]]
 6. free内存
 7. ![[20251109-17-24-28.png]]
-#### 打印堆内存
+#### 打印堆内存快照
+```c
+int main()  
+{  
+    //设置utf8编码，关闭printf缓冲区  
+    SetConsoleOutputCP(65001);  
+    setvbuf(stdout, NULL, _IONBF, 0);  
+  
+    //获取heap_snap, heap_list  
+    HANDLE heap_snap = CreateToolhelp32Snapshot(TH32CS_SNAPHEAPLIST, GetCurrentProcessId());  
+    HEAPLIST32 heap_list = {.dwSize = sizeof(HEAPLIST32)};  
+  
+    //假设从堆1，2，3，4，5，6开始读取  
+    Heap32ListFirst(heap_snap, &heap_list);  
+  
+    SIZE_T heap_size = 0;  
+  
+    do  
+    {  
+        //处理每一个堆中的信息  
+        HEAPENTRY32 heap_entry = {.dwSize = sizeof(HEAPENTRY32)};  
+  
+        printf("heap_id: %llu\n", heap_list.th32HeapID);  
+        Heap32First(&heap_entry, GetCurrentProcessId(), heap_list.th32HeapID);  
+        do  
+        {  
+            heap_size += heap_entry.dwBlockSize;  
+            printf("heap_addr:%p, size: %5llx, flag: %lu\n", (void*)heap_entry.dwAddress, heap_entry.dwBlockSize,  
+                   heap_entry.dwFlags);  
+            heap_entry.dwSize = sizeof(HEAPENTRY32);  
+            heap_size += heap_entry.dwBlockSize;  
+        }  
+        while (Heap32Next(&heap_entry));  
+    }  
+    while (Heap32ListNext(heap_snap, &heap_list));  
+  
+    printf("heap_size: %llx\n", heap_size);  
+  
+    return 0;  
+}
 ```
 
-```
-#### 观察内存泄漏
 
