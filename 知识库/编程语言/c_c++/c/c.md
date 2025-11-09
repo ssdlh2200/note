@@ -53,3 +53,26 @@ Process finished with exit code -1073741819 (0xC0000005)
 是 **Windows 系统特有的错误码**，0xC0000005 表示 **“访问违规（Access Violation）”**。也就是说，程序尝试访问了 **不允许访问的内存地址**
 
 ### 堆区
+#### 查看堆内存
+```c
+int main()  
+{  
+    setvbuf(stdout, NULL, _IONBF, 0);  
+      
+    int* pointer = malloc(sizeof(int));  
+    printf("pointer: %p\n", pointer);  
+    *pointer = 0xffaaccbb;  
+  
+    *pointer = 0x11223344;  
+    return 0;  
+}
+```
+使用dbg调试查看内存
+1. 首先执行到printf函数打印出pointer所在堆内存的地址000001c69b962710
+2. 转到该地址内存
+- ![[20251109-04-15-34.png]]
+3. 执行赋值ffaaccbb
+4. ![[20251109-04-16-38.png]]
+5. 执行赋值11223344
+6. ![[20251109-04-17-02.png]]
+#### 观察内存泄漏
