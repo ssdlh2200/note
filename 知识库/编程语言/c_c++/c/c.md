@@ -62,7 +62,7 @@ Process finished with exit code -1073741819 (0xC0000005)
 int main()  
 {  
     setvbuf(stdout, NULL, _IONBF, 0);  
-  
+    
     int* pointer = malloc(sizeof(int));  
     printf("pointer: %p\n", pointer);  
     *pointer = 0xffaaccbb;  
