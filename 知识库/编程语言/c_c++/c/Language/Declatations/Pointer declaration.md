@@ -123,20 +123,59 @@ p -> x = 10; //等价于(*p).x = 10;
 ### ...等待添加https://en.cppreference.com/w/c/language/pointer.html
 
 ### Pointer to functions
-函数指针在汇编层面就是函数指针保存着函数调用call的地址
-- 汇编层面的函数调用：call 0x7ff659d315e0
-- 函数指针就是保存着0x7ff659d315e0
+#### 函数指针定义
+**在C语言中，函数名本身代表该函数的地址，比如 f 与 &f 等价**
 ```c
 void f(int);
 
 void (*pf1)(int) = &f;
 void (*pf2)(int) = f; // same as &f
 ```
-在表达式中f会转换为&f，即
+与函数不同，函数指针时对象，因此可以被存储在数组中、复制、赋值、作为参数传递给其他函数等
 ```c
-f == &f
+void (*arr[3])(int); //函数指针数组
+arr[0] = f;
+```
+函数指针可以像调用普通函数那样出现在函数调用操作符()的左边，从而调用它指向的函数
+```c
+#include <stdio.h>
+
+int f(int n)
+{
+    printf("%d\n", n);
+    return n * n;
+}
+
+int main(void)
+{
+    int (*p)(int) = f; // 定义并初始化函数指针
+    int x = p(7);      // 通过指针调用函数，相当于 f(7)
+}
+
+```
+对函数指针解引用（\*p）会得到该函数的“函数名称标识符”
+```c
+int f();
+int (*p)() = f;    // 指针 p 指向 f
+(*p)(); // 通过函数指针解引用调用 f
+p();    // 直接用指针调用 f（等价）
+```
+(\*p)() 和 p() 都等价于 f()
+#### 函数指针比较
+函数指针可以用\=\=或者\!\=比较，如果它们指向同一个函数则相等
+顶层const对函数参数没有影响（因为传参时可以互换）
+int (\*)(int) 和 int (\*)(const int )类型可以互换
+```c
+int f(int), fc(const int);
+int (*pc)(const int) = f; // OK
+int (*p)(int) = fc;       // OK
+pc = p;                   // OK
+
 ```
 
+函数指针在汇编层面就是函数指针保存着函数调用call的地址
+- 汇编层面的函数调用：call 0x7ff659d315e0
+- 函数指针就是保存着0x7ff659d315e0
 ### Pointers to void
 任何类型对象的指针都可以Implicit conversions（隐式）地转换为 void*
 ```c
