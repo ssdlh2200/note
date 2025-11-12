@@ -1,7 +1,44 @@
 # java.util.concurrent.locks
 ## LockSupport
 ### 常用方法
-+ Lock.park()
+相比wait、notify，LockSupport中的park、unpark方法优点如下：
+- 能够唤醒指定线程
+- 避免死锁问题
+
+| 方法                                              | 描述                          |
+| ----------------------------------------------- | --------------------------- |
+| `void park()`                                   | 阻塞当前线程，直到被唤醒                |
+| `void park(Object blocker)`                     | 阻塞当前线程，并关联一个阻塞对象            |
+| `void parkNanos(long nanos)`                    | 阻塞当前线程，最多等待指定纳秒时间           |
+| `void parkNanos(Object blocker, long nanos)`    | 阻塞当前线程，并关联一个阻塞对象，最多等待指定纳秒时间 |
+| `void parkUntil(long deadline)`                 | 阻塞当前线程，直到指定的绝对时间点           |
+| `void parkUntil(Object blocker, long deadline)` | 阻塞当前线程，并关联一个阻塞对象，直到指定的绝对时间点 |
+| `void unpark(Thread thread)`                    | 唤醒指定的线程                     |
+| `Object getBlocker(Thread thread)`              | 获取指定线程关联的阻塞对象               |
+#### park、unpark
+```java
+public static void main(String[] args) throws InterruptedException {  
+    Thread t1 = new Thread(() -> {  
+        System.out.println("thread1 park...");  
+        LockSupport.park();  
+        System.out.println("threa1 unpark");  
+    });  
+  
+    t1.start();  
+    Thread.sleep(1000);  
+    System.out.println("t1 state: " + t1.getState());  
+    LockSupport.unpark(t1);  
+}
+```
+运行结果
+```text
+thread1 park...
+t1 state: WAITING
+threa1 unpark
+```
+#### park、getBlocker
+
+
 
 ### 原理
 #### park()底层原理

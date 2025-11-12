@@ -277,7 +277,7 @@ t1.setPriority(0);//设置优先级范围（1-10），效果不明显，主要�
 t1.isAlive();//当前线程是否存活（还没有运行完毕）
 ```
 ### 线程阻塞-wait/notify、Monitor
-#### 休眠、唤醒线程
+#### wait、notify线程
 ```java
 /*
 ❌❌❌❌
@@ -334,34 +334,8 @@ public static void main(String[] args) throws InterruptedException {
 + lock.wait()：持有锁的线程进入到lock监视器waitSet等待
 + lock.notify()：在monitor中waitSet等待的线程中随机挑选一个唤醒
 + lock.notifuAll()：waitSet等待的线程全部唤醒
-#### 休眠、唤醒原理
-
-![](https://cdn.nlark.com/yuque/0/2024/png/33704534/1709733378688-ab94f4bd-7dc4-4594-834d-33061bf67a6b.png)
-
-**synchronized**给对象上锁，当这对象锁升级为**重量级锁**之后，object header中的mark word就会成为指向一个**Monitor**的指针
-
-```java
-假设线程A启动,执行到 synchronized 同步代码块时（假设此时锁已经升级为重量级锁）
-对象锁的 mark word 会变为如下：
-|--------------------------------|------|
-|  prt_to_heavyweight_monitor:30 |  10  |
-|--------------------------------|------|
-Owner ---> A线程
-
-当其它线程同样获取lock对象锁时,发现已经有指向的monitor,
-便去查找Owner是否有线程,如果有,则线程进入EntryList等待Owner释放
-(线程进入EntryList则线程状态显示为BLOCKED)
-```
-
-+ 由上可知Monitor对象中分为中有三个概念：
-    1. **WaitSet**：线程等待集合，存放调用锁的wait()进入等待集合的线程或者获取不到锁的线程。
-        - 调用wait()，线程进入WAITING状态，此状态下的线程一直等待直到其它线程唤醒。
-        - 调用wait(long timeout)，线程进入TIMED-WAITING状态，此状态的线程超时自动进入entryList。
-        - 调用notify()时，随机唤起一个waitset中的线程进入entryList
-        - 当我们调用notifyAll()时，将唤起waitset中的所有线程进入entryList。
-    2. **EntryList**：一个存放等待获取对象锁的线程的列表。
-        * EntryList中的线程处于阻塞状态（BLOCKED），EntryList 中的线程竞争获取锁。
-    3. **Owner**：当前持有对象锁的线程。
+#### wait、notify原理-link
+[[objectMonitor.hpp]]
 
 #### Thread.sleep() 和 Object#wait() 区别
 + Object.wait()之后
@@ -371,11 +345,8 @@ Owner ---> A线程
 + Thread.sleep()之后:
     - 线程暂停执行, 让出CPU时间片，不会有其它操作
 
-### 线程等待-park/unpark
-
-
-
-
+### 线程等待-park/unpark-link
+[[Locks]]
 
 ### 线程中断/打断机制(已整理😃还有一些些。。。)
 #### 中断线程原理方法
@@ -384,9 +355,7 @@ Java 中的中断是协作式中断
 + 处于 WAITING 或者 TIMED_WAITING 状态的线程，则会抛出 InterruptedException 异常
 + <font style="color:#DF2A3F;">这里结论我目前无法百分百确定，处于BLOCKED状态下的线程，调用interrupted方法只是将中断标志位设置为true，再无其他作用（就是这里，真的BLCKDED状态下的线程再无其他啥变化了？？？）</font>
 
-> <font style="color:rgb(24, 25, 28);">协作式中断：协作式中断不会立即打断正在运行的任务。相反（抢占式中断），它会等待当前任务完成或主动让出执行权后才会进行中断处理。这种机制可以避免在关键时刻被打断，从而减少了复杂性和错误的发生机会。</font>
->
-
+> 协作式中断：协作式中断不会立即打断正在运行的任务。相反（抢占式中断），它会等待当前任务完成或主动让出执行权后才会进行中断处理。这种机制可以避免在关键时刻被打断，从而减少了复杂性和错误的发生机会。
 1. **interrupt()**：将线程的中断标志位设置为true
 2. **isInterrupted()**：判断当前线程的中断标志位是否为true，不会清除终端标志位
 3. **Thread.interrupted()**：判断当前线程的中断标志位是否为true，清除终端标志位，重置为false
