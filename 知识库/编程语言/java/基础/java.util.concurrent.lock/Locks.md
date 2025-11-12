@@ -36,10 +36,27 @@ thread1 park...
 t1 state: WAITING
 threa1 unpark
 ```
-#### park、getBlocker
-
-
-
+#### park(lock)
+通过pack(lock)能够通过jstack让我们方便得知线程正在等待哪个锁
+```java
+public static void main(String[] args) throws InterruptedException {  
+    Object lock = new Object();  
+    Thread t1 = new Thread(() -> {  
+        System.out.println("thread1 park...");  
+        LockSupport.park(lock);  
+    }, "t1");  
+    Thread t2 = new Thread(() -> {  
+        System.out.println("thread2 park...");  
+        LockSupport.park();  
+    }, "t2");  
+    t1.start();  
+    t2.start();  
+    Thread.sleep(1000);  
+    System.out.println(ProcessHandle.current().pid());  
+    Thread.sleep(100000);  
+}
+```
+![[20251113-00-28-30.png]]
 ### 原理
 #### park()底层原理
 + [https://www.cnblogs.com/yonghengzh/p/14280670.html](https://www.cnblogs.com/yonghengzh/p/14280670.html)
