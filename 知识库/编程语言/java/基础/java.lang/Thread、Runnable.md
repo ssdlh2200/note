@@ -86,13 +86,12 @@ public enum State {
     TERMINATED;
 }
 ```
-
-![](https://cdn.nlark.com/yuque/0/2024/png/33704534/1725391975853-5af26521-8e6d-4ce2-b226-53c22a8a52d8.png)
+![[20251112-15-39-52.png]]
 下面将介绍这6种线程状态
 + **NEW：** 线程刚被创建，但是还没有调用start()方法 
-+ **RUNNABLE：** 线程被调用了start()方法后的状态，JAVA 线程把操作系统中的就绪（ready）和运行（running）两种状态统一称为可运行（runnable）
-+ **BLOCKED：** 在该BLOCKED状态下，一个线程即将进入一个synchronized块，但当前有另一个线程正在synchronized同一对象的块内运行。然后，第一个线程必须等待第二个线程退出其块，当线程等待获取监视器锁时，它就会进入BLOCKED状态。
-<div style="background-color: #ffe4e1; padding: 10px; border-left: 4px solid #f1c40f;">这里BLOCKED状态，测试下来只有线程竞争获取对象锁（监视器monitor锁）的时候,才能让线程进入BLOCKED状态<br/>
++ **RUNNABLE：** 线程调用了start()方法后的状态，JAVA 线程把操作系统中的就绪（ready）和运行（running）两种状态统一称为可运行（runnable）
++ **BLOCKED：** 当线程尝试获取对象锁失败时，进入EntryList中，该线程处于BLOCKED状态
+<div style="background-color: #ffe4e1; padding: 10px; border-left: 4px solid #f1c40f;color: black">这里BLOCKED状态，测试下来只有线程竞争获取对象锁（监视器monitor锁）的时候,才能让线程进入BLOCKED状态<br/>
 
 - ReentrantLock.lock()让线程进入waiting状态<br/>
 
@@ -184,7 +183,7 @@ static void terminatedState() throws InterruptedException {
 + [https://www.cnblogs.com/muzhongjiang/p/15134397.html](https://www.cnblogs.com/muzhongjiang/p/15134397.html)（莫名其妙的，紧跟着标题就无法显示的标题）
 
 ### 常用方法
-#### start：启动线程
+#### 启动线程-start()
 start()方法用于开启线程，start方法只是让线程进入就绪，里面的代码不一定立刻运行（CPU时间片还没有分配给它），每个线程start()方法只能调用一次，调用了多次会出现 IllegalThreadException
 ```java
 Thread t0 = new Thread(()->{
@@ -195,7 +194,7 @@ t0.start();
 为什么不能start()多次？
 从源码角度分析
 + [https://javabetter.cn/thread/thread-state-and-method.html](https://javabetter.cn/thread/thread-state-and-method.html)（Java线程的6种状态及切换(透彻讲解) _ 二哥的Java进阶之路）
-#### Thread.sleep：让当前线程休眠
+#### 线程休眠-Thread.sleep()
 ```java
 log.info("线程开始休眠");
 new Thread(() -> {
@@ -208,7 +207,7 @@ new Thread(() -> {
 Thread.sleep(1000);
 log.info("线程休眠结束");
 ```
-#### join：等待线程运行结束
+#### 等待线程运行结束-join()
 join方法的底层原理是wait方法
 ```java
 //t1线程每间隔0.5s输出1个数，直到5
@@ -277,7 +276,7 @@ t1.getPriority();//获得优先级
 t1.setPriority(0);//设置优先级范围（1-10），效果不明显，主要还是由操作系统来决定
 t1.isAlive();//当前线程是否存活（还没有运行完毕）
 ```
-### wait/notify、Monitor
+### 线程阻塞-wait/notify、Monitor
 #### 休眠、唤醒线程
 ```java
 /*
@@ -371,6 +370,12 @@ Owner ---> A线程
     - 线程暂停执行, 让出CPU时间片
 + Thread.sleep()之后:
     - 线程暂停执行, 让出CPU时间片，不会有其它操作
+
+### 线程等待-park/unpark
+
+
+
+
 
 ### 线程中断/打断机制(已整理😃还有一些些。。。)
 #### 中断线程原理方法
