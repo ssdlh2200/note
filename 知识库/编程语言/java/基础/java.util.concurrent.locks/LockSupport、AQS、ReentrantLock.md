@@ -66,16 +66,111 @@ public static void main(String[] args) throws InterruptedException {
 [[unsafe.cpp#原理总结]]
 
 ## AQS
-java.util.concurrent 中大部分同步器是基于 aqs 实现的，同步器一般包含两种方法一种是 acquire 和 release
+### AQS原理概述
+在 Java 中，AQS是一个 **基于队列的锁框架:**
+- 获取锁失败的线程，会被 **封装成节点** 加入 **双向 FIFO 队列**
+- 队列节点自旋或阻塞等待前驱释放锁
+- 支持公平锁和非公平锁、支持可重入锁和条件队列
+- AQS整体框架
+![[20251116-12-01-24.png]]
+- AQS将每条请求共享资源的线程封装成一个节点来实现锁的分配，AQS中的队列是CLH变体的虚拟双向队列
+    - 通过使用state成员变量表示同步状态
+    - 通过内置双向队列完成资源获取的排队工作
+    - 通过CAS完成对state值的修改
+![[20251116-12-06-08.png]]
+### AQS-Node
+#### 数据结构
+```java
+abstract static class Node {  
+    //队列前驱节点
+    //通过CAS将当前节点插入到队尾时设置
+    volatile Node prev;
+    
+    //队列后继节点
+    //当一个节点可能被唤醒（signallable）时必须为非null
+    volatile Node next;
+    
+    //记录此节点代表的等待线程
+    //入队后才必定非null
+    //非volatile是因为thread加入后本身不会改变（只读）
+    Thread waiter;
+    
+    //保存节点状态，通常包括
+        //是否被取消
+        //是否在等待
+        //是否需要signal
+    volatile int status;
+  
+    // 原子操作方法   
+    final boolean casPrev(Node c, Node v) {  // for cleanQueue  
+        return U.weakCompareAndSetReference(this, PREV, c, v);  
+    }  
+    final boolean casNext(Node c, Node v) {  // for cleanQueue  
+        return U.weakCompareAndSetReference(this, NEXT, c, v);  
+    }  
+    final int getAndUnsetStatus(int v) {     // for signalling  
+        return U.getAndBitwiseAndInt(this, STATUS, ~v);  
+    }  
+    final void setPrevRelaxed(Node p) {      // for off-queue assignment  
+        U.putReference(this, PREV, p);  
+    }  
+    final void setStatusRelaxed(int s) {     // for off-queue assignment  
+        U.putInt(this, STATUS, s);  
+    }  
+    final void clearStatus() {               // for reducing unneeded signals  
+        U.putIntOpaque(this, STATUS, 0);  
+    }  
+  
+    //得到status字段在对象内存中的偏移，这是cas原子操作需要的地址
+    private static final long STATUS  
+        = U.objectFieldOffset(Node.class, "status");  
+    private static final long NEXT  
+        = U.objectFieldOffset(Node.class, "next");  
+    private static final long PREV  
+        = U.objectFieldOffset(Node.class, "prev");  
+}
 
-+ acquire 操作阻塞调用的线程，直到或除非同步状态允许其继续运行
-+ release 操作通过某种方式改变同步状态，使得一或多个被acquire阻塞的线程继续执行运行
 
-### 参考链接
-- AQS作者论文中文
+//独占模式的队列节点，只有一个线程能够获取锁
+static final class ExclusiveNode extends Node { }
+//共享模式的队列节点，多个线程可以同时获取锁
+static final class SharedNode extends Node { }  
+//条件队列节点
+static final class ConditionNode extends Node  
+    implements ForkJoinPool.ManagedBlocker {  
+    ConditionNode nextWaiter;
+```
+#### AQS.state
+每个AQS队列中都有一个state字段，用来展示锁的获取情况
+- **注意：AQS中的state是同步器状态和Node中的status节点状态不同**
+下面是访问state的字段的方法
+```java
+//获取state值
+protected final int getState()
+
+//设置state值
+protected final void setState(int newState)
+
+//cas方式更新state
+protected final boolean compareAndSetState(int expect, int update)
+```
+
+
+### AQS参考链接
+- 《The java.util.concurrent Synchronizer Framework》 JUC同步器框架（AQS框架）原文翻译 - 只会一点java - 博客园
     - https://www.cnblogs.com/dennyzhangdd/p/7218510.html（存档）
+- 从ReentrantLock的实现看AQS的原理及应用 - 美团技术团队
+    - https://tech.meituan.com/2019/12/05/aqs-theory-and-apply.html(存档)
+
+
+
+
+
 
 ## ReentrantLock（锁）
+
+
+
 ## Semaphore（信号量）
 用来限制访问共享资源的线程上限，Semaphore 适合一个线程一个资源的场景，例如数据库连接池。
 

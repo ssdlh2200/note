@@ -346,7 +346,7 @@ public static void main(String[] args) throws InterruptedException {
     - 线程暂停执行, 让出CPU时间片，不会有其它操作
 
 ### 线程等待-park/unpark-link
-[[LockSupport、AQS]]
+[[LockSupport、AQS、ReentrantLock]]
 
 ### 线程中断/打断机制(已整理😃还有一些些。。。)
 #### 中断线程原理方法

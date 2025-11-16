@@ -40,7 +40,7 @@
 
 
 
-+ **<font style="color:#000000;background-color:#ffffff;">ExecutorService</font>**
+- ExecutorService
 ```java
 ExecutorService executor = Executors.newFixedThreadPool(1); //创建一个线程
 Callable<Integer> task = new Callable<Integer>(){
