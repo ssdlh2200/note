@@ -21,6 +21,7 @@
 | Object getBlocker(Thread thread)              | 获取指定线程关联的阻塞对象               |
 
 ### park、unpark
+- 正常park和unpark
 ```java
 public static void main(String[] args) throws InterruptedException {  
     Thread t1 = new Thread(() -> {  
@@ -40,6 +41,32 @@ public static void main(String[] args) throws InterruptedException {
 thread1 park...
 t1 state: WAITING
 threa1 unpark
+```
+- 提前unpark和park
+```java
+public static void main(String[] args) {  
+  
+    Thread t1 = new Thread(() -> {  
+        try {  
+            Thread.sleep(3000);  
+        } catch (InterruptedException e) {  
+            throw new RuntimeException(e);  
+        }  
+        System.out.println("2. t1 start");  
+        LockSupport.park();  
+        System.out.println("3. t1 wake up");  
+    }, "t1");  
+  
+    t1.start();  
+    System.out.println("1. main thread unpark t1");  
+    LockSupport.unpark(t1);  
+}
+```
+运行结果
+```text
+1. main thread unpark t1
+2. t1 start
+3. t1 wake up
 ```
 ### park(lock)
 通过pack(lock)能够通过jstack让我们方便得知线程正在等待哪个锁
@@ -78,6 +105,7 @@ public static void main(String[] args) throws InterruptedException {
     - 通过内置双向队列完成资源获取的排队工作
     - 通过CAS完成对state值的修改
 ![[20251116-12-06-08.png]]
+
 ### AQS-Node
 #### 数据结构
 ```java
@@ -140,8 +168,34 @@ static final class ConditionNode extends Node
     implements ForkJoinPool.ManagedBlocker {  
     ConditionNode nextWaiter;
 ```
-#### AQS.state
+####
+```java
+//表示节点正在等待被某个条件唤醒（unpark），调用LockSupport.park进入等待，节点status会被设置为waiting
+//must be 1
+static final int WAITING   = 1;
+
+//表示节点取消了等待（超时，线程中断或者显示取消）
+//为什么为负数？因为队列扫描中只要status < 0,就可以判断节点为取消
+// must be negative  
+static final int CANCELLED = 0x80000000;
+
+//
+static final int COND      = 2;          // in a condition wait
+```
+### AQS-state
 每个AQS队列中都有一个state字段，用来展示锁的获取情况
+```java
+private volatile int state;
+```
+state在不同的子类实现中有不同的含义，以ReentrantLock为例
+
+| ReentrantLock |                 |
+| ------------- | --------------- |
+| state = 0     | 当前共享资源未被加锁      |
+| state = 1     | 当前共享资源被一个线程加锁   |
+| state > 1     | 当前共享资源被一个线程多次加锁 |
+
+
 - **注意：AQS中的state是同步器状态和Node中的status节点状态不同**
 下面是访问state的字段的方法
 ```java
@@ -161,13 +215,24 @@ protected final boolean compareAndSetState(int expect, int update)
     - https://www.cnblogs.com/dennyzhangdd/p/7218510.html（存档）
 - 从ReentrantLock的实现看AQS的原理及应用 - 美团技术团队
     - https://tech.meituan.com/2019/12/05/aqs-theory-and-apply.html(存档)
-
-
+- AQS源码分析(一)AQS类定义与Node数据结构详解
+    - https://www.bilibili.com/video/BV1Fd4y1b7Qp
 
 
 
 
 ## ReentrantLock（锁）
+### 默认锁
+ReentrantLock默认使用非公平锁
+```java
+public ReentrantLock() {  
+    sync = new NonfairSync();  
+}
+```
+
+
+
+
 
 
 
