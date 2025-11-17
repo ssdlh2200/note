@@ -278,9 +278,10 @@ final boolean initialTryLock() {
     //判断当前获取锁的线程是否为exclusiveThread
     //如果是的话代表那么就重入该锁
     else if (getExclusiveOwnerThread() == current) {  
-        //
         int c = getState() + 1;  
-        if (c < 0) // overflow  
+        
+        //int最大值 + 1 小于0，导致溢出，说明超过可重入次数
+        if (c < 0)
             throw new Error("Maximum lock count exceeded");  
         setState(c);  
         return true;} 
@@ -324,15 +325,27 @@ NonfairSync中的tryAcquire，再次尝试fast path获取锁
 //AQS.class
 
 final int acquire(Node node, int arg, boolean shared,  
-                  boolean interruptible, boolean timed, long time) {  
-    Thread current = Thread.currentThread();  
-    byte spins = 0, postSpins = 0;   // retries upon unpark of first thread  
-    boolean interrupted = false, first = false;  
-    Node pred = null;                // predecessor of node when enqueued  
-  
-    /*     * Repeatedly:     *  Check if node now first     *    if so, ensure head stable, else ensure valid predecessor     *  if node is first or not yet enqueued, try acquiring     *  else if node not yet created, create it     *  else if not yet enqueued, try once to enqueue     *  else if woken from park, retry (up to postSpins times)     *  else if WAITING status not set, set and retry     *  else park and clear WAITING status, and check cancellation     */  
-    for (;;) {  
-        if (!first && (pred = (node == null) ? null : node.prev) != null &&  
+                  boolean interruptible, boolean timed, long time) { 
+    //非公平锁入队列时，参数中只有args有值，且为 1
+    Thread current = Thread.currentThread(); 
+    //自旋计数，用于短时间自旋重试
+    byte spins = 0, postSpins = 0;
+    //等待过程是否被中断，前驱节点是否为head
+    boolean interrupted = false, first = false;
+    //前驱节点指针  
+    Node pred = null;
+    
+    //函数循环的作用
+    // 1.检查自己是否处于队头
+    // 2.若没有入队列，则尝试tryAcquire/tryAcquireShared
+    // 3.若拿到锁，做队列头清理
+    // 4.若没有锁，入队，设置状态为waiting，然后park等待（或者自旋） 
+    // 5.被唤醒或者超时/中断后重试，若最终失败则调用cancelAcquire
+    for (;;) {
+          //前驱节点是head进入
+          //
+        if (!first && (pred = (node == null) ? null : node.prev) != null 
+            &&  
             !(first = (head == pred))) {  
             if (pred.status < 0) {  
                 cleanQueue();           // predecessor cancelled  
