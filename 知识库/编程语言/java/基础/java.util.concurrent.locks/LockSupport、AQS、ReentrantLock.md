@@ -396,6 +396,7 @@ final int acquire(Node node, int arg, boolean shared,
             else  
                 node = new ExclusiveNode();  
         } 
+        
         //再一次经历上面循环后pred == null，尚未入队尝试插入队尾
         else if (pred == null) {          // try to enqueue  
             node.waiter = current;  
@@ -412,16 +413,25 @@ final int acquire(Node node, int arg, boolean shared,
             else 
                 //插入队尾成功，设置队尾的next为当前节点
                 t.next = node;  
+                
+        //如果该节点是first 并且 spins非0，则进行短自旋
+        //即避免某些线程反复被唤醒又入队造成饥饿
+        //自旋会短时间轮询再尝试tryAcquire，避免立刻 park/unpark 的开销。       
         } else if (first && spins != 0) {  
-            --spins;                        // reduce unfairness on rewaits  
+            --spins; 
             Thread.onSpinWait();  
+        
+        //node.status为0，说明还没有设置waiting状态
         } else if (node.status == 0) {  
-            node.status = WAITING;          // enable signal and recheck  
+            node.status = WAITING;
+            
+        //处于waiting状态执行真正的阻塞逻辑
         } else {  
             long nanos;  
             spins = postSpins = (byte)((postSpins << 1) | 1);  
             if (!timed)  
-                LockSupport.park(this);  
+                LockSupport.park(this);
+            //超时  
             else if ((nanos = time - System.nanoTime()) > 0L)  
                 LockSupport.parkNanos(this, nanos);  
             else  
