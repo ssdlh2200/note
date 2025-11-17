@@ -342,8 +342,8 @@ final int acquire(Node node, int arg, boolean shared,
     // 4.若没有锁，入队，设置状态为waiting，然后park等待（或者自旋） 
     // 5.被唤醒或者超时/中断后重试，若最终失败则调用cancelAcquire
     for (;;) {
-          //前驱节点是head进入
-          //
+    
+        //检查前驱节点是否为head
         if (!first && (pred = (node == null) ? null : node.prev) != null 
             &&  
             !(first = (head == pred))) {  
@@ -354,7 +354,10 @@ final int acquire(Node node, int arg, boolean shared,
                 Thread.onSpinWait();    // ensure serialization  
                 continue;  
             }  
-        }  
+        }
+        
+        //若first == true表示前驱是head，尝试fast path - try acquire
+        //若pred  == null表示还没有进入队列，尝试fast path-try acquire
         if (first || pred == null) {  
             boolean acquired;  
             try {  
@@ -365,35 +368,49 @@ final int acquire(Node node, int arg, boolean shared,
             } catch (Throwable ex) {  
                 cancelAcquire(node, interrupted, false);  
                 throw ex;  
-            }  
+            }
             if (acquired) {  
+                //获取锁成功，并且自己的前驱节点是head，需要做一些清理工作
                 if (first) {  
-                    node.prev = null;  
-                    head = node;  
+                    node.prev = null; 
+                    //把自己设置为head 
+                    head = node;
+                    //清除引用，gc
                     pred.next = null;  
-                    node.waiter = null;  
+                    node.waiter = null;
+                    //共享模式还要唤醒后继节点  
                     if (shared)  
-                        signalNextIfShared(node);  
+                        signalNextIfShared(node);
+                    //等待过程中曾记录被中断，成功后恢复中断  
                     if (interrupted)  
                         current.interrupt();  
                 }  
                 return 1;  
             }  
-        }  
-        if (node == null) {                 // allocate; retry before enqueue  
+        }
+        
+        //创建节点准备进入阻塞队列，再一次循环
+        if (node == null) {
             if (shared)  
                 node = new SharedNode();  
             else  
                 node = new ExclusiveNode();  
-        } else if (pred == null) {          // try to enqueue  
+        } 
+        //再一次经历上面循环后pred == null，尚未入队尝试插入队尾
+        else if (pred == null) {          // try to enqueue  
             node.waiter = current;  
-            Node t = tail;  
+            Node t = tail;
+            //前驱节点设置为tail，插入队尾
             node.setPrevRelaxed(t);         // avoid unnecessary fence  
+            //队列初始化设置head
             if (t == null)  
-                tryInitializeHead();  
-            else if (!casTail(t, node))  
+                tryInitializeHead(); 
+            //否则插入队尾 
+            else if (!casTail(t, node))
+                //若失败回滚  
                 node.setPrevRelaxed(null);  // back out  
-            else  
+            else 
+                //插入队尾成功，设置队尾的next为当前节点
                 t.next = node;  
         } else if (first && spins != 0) {  
             --spins;                        // reduce unfairness on rewaits  
