@@ -168,7 +168,7 @@ static final class ConditionNode extends Node
     implements ForkJoinPool.ManagedBlocker {  
     ConditionNode nextWaiter;
 ```
-####
+#### status
 ```java
 //表示节点正在等待被某个条件唤醒（unpark），调用LockSupport.park进入等待，节点status会被设置为waiting
 //must be 1
@@ -194,7 +194,6 @@ state在不同的子类实现中有不同的含义，以ReentrantLock为例
 | state = 0     | 当前共享资源未被加锁      |
 | state = 1     | 当前共享资源被一个线程加锁   |
 | state > 1     | 当前共享资源被一个线程多次加锁 |
-
 
 - **注意：AQS中的state是同步器状态和Node中的status节点状态不同**
 下面是访问state的字段的方法
@@ -229,8 +228,48 @@ public ReentrantLock() {
     sync = new NonfairSync();  
 }
 ```
+### Lock解析
+当我们调用ReentrantLock中的lock方法时会调用到这里
+```java
+//new ReentrantLock().lock()会调用到这里
+public void lock() {  
+    sync.lock();
+}
 
+//sync.lock()会调用到这里
+final void lock() {  
+    if (!initialTryLock())  
+        acquire(1);  
+}
 
+//initialTryLock()会调用这里，具体实现取决于采用公平锁还是非公平锁
+abstract boolean initialTryLock();
+```
+- initialTryLock()：尝试立即获取锁（快速路径）
+    - 公平锁获取
+    - 非公平锁获取
+- acquire(1)：获取失败，则进入 AQS 的“排队阻塞”流程（慢路径）
+这就是典型的 fast path + slow path 设计，那我们下面来看一下非公平锁的initialTryLock
+```java
+//NofairSync
+final boolean initialTryLock() {  
+    Thread current = Thread.currentThread();  
+    
+    //直接尝试修改aqs中state的值
+    // 0:代表未jia'su
+    if (compareAndSetState(0, 1)) {
+        setExclusiveOwnerThread(current);  
+        return true;  
+    } else if (getExclusiveOwnerThread() == current) {  
+        int c = getState() + 1;  
+        if (c < 0) // overflow  
+            throw new Error("Maximum lock count exceeded");  
+        setState(c);  
+        return true;  
+    } else  
+        return false;  
+}
+```
 
 
 
