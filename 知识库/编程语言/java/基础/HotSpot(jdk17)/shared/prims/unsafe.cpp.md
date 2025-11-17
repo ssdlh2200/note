@@ -78,7 +78,10 @@ extern "C"
 ```cpp
 EventThreadPark event;
 JavaThreadParkedState jtps(thread, time != 0);  
+
+//thread->parker()->park 选择不同平台（windows，posix）执行park逻辑
 thread->parker()->park(isAbsolute != 0, time);  
+
 if (event.should_commit()) 
 {  
     const oop obj = thread->current_park_blocker();  
@@ -93,7 +96,7 @@ if (event.should_commit())
     }  
 }
 ```
-#### thread->parker()->park选择不同平台（windows，posix）执行park逻辑
+#### 不同平台执行park逻辑
 ##### os::posix
 ```c
 void Parker::park(bool isAbsolute, jlong time) {

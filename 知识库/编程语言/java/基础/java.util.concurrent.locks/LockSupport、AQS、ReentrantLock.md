@@ -1,4 +1,4 @@
-# LockSupport、AQS
+# LockSupport、AQS、ReentrantLock
 ## LockSupport（线程阻塞、唤醒）
 ### 常用方法
 相比wait、notify，LockSupport中的park、unpark方法优点如下：
@@ -228,8 +228,8 @@ public ReentrantLock() {
     sync = new NonfairSync();  
 }
 ```
-### Lock解析
-#### 前置
+### NonfairSync-Lock解析
+#### fast path或slow path
 当我们调用ReentrantLock中的lock方法时会调用到这里
 ```java
 //new ReentrantLock().lock()会调用到这里
@@ -251,7 +251,7 @@ abstract boolean initialTryLock();
     - 非公平锁获取
 - acquire(1)：获取失败，则进入 AQS 的“排队阻塞”流程（慢路径）
 这就是典型的 fast path + slow path 设计
-#### fast path - initialTryLock
+#### fast path获取锁 - initialTryLock
 - 获取锁成功
 - 不进入aqs队列
 - 只做一次cas或者可重入检查
@@ -289,32 +289,136 @@ final boolean initialTryLock() {
     //返回false进入slow path等待锁
     else  
         return false;  
-        
-    
 }
 ```
-#### slow path - acquire
+#### slow path获取锁 - AQS - acquire
 - 获取锁失败
 - 必须进入aqs队列
 - 线程需要park阻塞
+```java
+//ReentrantLock.class
 
+public final void acquire(int arg) {  
+    if (!tryAcquire(arg))  
+        acquire(null, arg, false, false, false, 0L);  
+}
 
+protected boolean tryAcquire(int arg) {  
+    throw new UnsupportedOperationException();  
+}
+```
+NonfairSync中的tryAcquire，再次尝试fast path获取锁
+```java
+//ReentrantLock.class --> NonfairSync.class
+    protected final boolean tryAcquire(int acquires) {  
+        if (getState() == 0 && compareAndSetState(0, acquires)) {  
+            setExclusiveOwnerThread(Thread.currentThread());  
+            return true;  
+        }  
+        return false;  
+    }  
+}
+```
+失败则进入slow path acquire(null, arg, false, false, false, 0L);
+```java
+//AQS.class
 
+final int acquire(Node node, int arg, boolean shared,  
+                  boolean interruptible, boolean timed, long time) {  
+    Thread current = Thread.currentThread();  
+    byte spins = 0, postSpins = 0;   // retries upon unpark of first thread  
+    boolean interrupted = false, first = false;  
+    Node pred = null;                // predecessor of node when enqueued  
+  
+    /*     * Repeatedly:     *  Check if node now first     *    if so, ensure head stable, else ensure valid predecessor     *  if node is first or not yet enqueued, try acquiring     *  else if node not yet created, create it     *  else if not yet enqueued, try once to enqueue     *  else if woken from park, retry (up to postSpins times)     *  else if WAITING status not set, set and retry     *  else park and clear WAITING status, and check cancellation     */  
+    for (;;) {  
+        if (!first && (pred = (node == null) ? null : node.prev) != null &&  
+            !(first = (head == pred))) {  
+            if (pred.status < 0) {  
+                cleanQueue();           // predecessor cancelled  
+                continue;  
+            } else if (pred.prev == null) {  
+                Thread.onSpinWait();    // ensure serialization  
+                continue;  
+            }  
+        }  
+        if (first || pred == null) {  
+            boolean acquired;  
+            try {  
+                if (shared)  
+                    acquired = (tryAcquireShared(arg) >= 0);  
+                else  
+                    acquired = tryAcquire(arg);  
+            } catch (Throwable ex) {  
+                cancelAcquire(node, interrupted, false);  
+                throw ex;  
+            }  
+            if (acquired) {  
+                if (first) {  
+                    node.prev = null;  
+                    head = node;  
+                    pred.next = null;  
+                    node.waiter = null;  
+                    if (shared)  
+                        signalNextIfShared(node);  
+                    if (interrupted)  
+                        current.interrupt();  
+                }  
+                return 1;  
+            }  
+        }  
+        if (node == null) {                 // allocate; retry before enqueue  
+            if (shared)  
+                node = new SharedNode();  
+            else  
+                node = new ExclusiveNode();  
+        } else if (pred == null) {          // try to enqueue  
+            node.waiter = current;  
+            Node t = tail;  
+            node.setPrevRelaxed(t);         // avoid unnecessary fence  
+            if (t == null)  
+                tryInitializeHead();  
+            else if (!casTail(t, node))  
+                node.setPrevRelaxed(null);  // back out  
+            else  
+                t.next = node;  
+        } else if (first && spins != 0) {  
+            --spins;                        // reduce unfairness on rewaits  
+            Thread.onSpinWait();  
+        } else if (node.status == 0) {  
+            node.status = WAITING;          // enable signal and recheck  
+        } else {  
+            long nanos;  
+            spins = postSpins = (byte)((postSpins << 1) | 1);  
+            if (!timed)  
+                LockSupport.park(this);  
+            else if ((nanos = time - System.nanoTime()) > 0L)  
+                LockSupport.parkNanos(this, nanos);  
+            else  
+                break;  
+            node.clearStatus();  
+            if ((interrupted |= Thread.interrupted()) && interruptible)  
+                break;  
+        }  
+    }  
+    return cancelAcquire(node, interrupted, interruptible);  
+}
 
+```
 
 ## Semaphore（信号量）
 用来限制访问共享资源的线程上限，Semaphore 适合一个线程一个资源的场景，例如数据库连接池。
 
-1. **构造方法**
-+ `**Semaphore(int permits)**`: 创建一个具有给定许可证数的 Semaphore，这些许可证最初是全部可用的。
-+ `**Semaphore(int permits, boolean fair)**`: 创建一个具有给定许可证数 Semaphore，并指定是否应遵循公平性策略。公平性策略指的是在多个线程竞争许可证时，Semaphore 会按线程请求的先后顺序分配许可证。
-2. **核心方法**
-+ `**void acquire() throws InterruptedException**`**: **从信号量中获取一个许可证，如果没有可用的许可证，它会阻塞直到一个许可证可用。
-+ `**void acquire(int permits) throws InterruptedException**`**: **获取指定数量的许可证。
-+ `**void release()**`**: **释放一个许可证，将其返回给信号量。
-+ `**void release(int permits)**`**: **释放指定数量的许可证，将它们返回给信号量。
-+ `**int availablePermits()**`**: **返回当前可用的许可证数量。
-+ `**boolean hasQueuedThreads()**`**: **检查是否有线程正在等待获取许可证。
-+ `**int getQueueLength()**`**: **返回正在等待获取许可证的线程数目。
+1. 构造方法
++ Semaphore(int permits): 创建一个具有给定许可证数的 Semaphore，这些许可证最初是全部可用的。
++ `Semaphore(int permits, boolean fair)**`: 创建一个具有给定许可证数 Semaphore，并指定是否应遵循公平性策略。公平性策略指的是在多个线程竞争许可证时，Semaphore 会按线程请求的先后顺序分配许可证。
+1. 核心方法
++ `void acquire() throws InterruptedException**`: 从信号量中获取一个许可证，如果没有可用的许可证，它会阻塞直到一个许可证可用。
++ `void acquire(int permits) throws InterruptedException**`: 获取指定数量的许可证。
++ `void release()`: 释放一个许可证，将其返回给信号量。
++ `void release(int permits): 释放指定数量的许可证，将它们返回给信号量。
++ `int availablePermits()`: 返回当前可用的许可证数量。
++ `boolean hasQueuedThreads()`: 检查是否有线程正在等待获取许可证。
++ `int getQueueLength()**`: 返回正在等待获取许可证的线程数目。
 
 ### acquire()原理
