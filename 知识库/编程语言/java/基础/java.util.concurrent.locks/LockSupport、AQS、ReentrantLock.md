@@ -229,6 +229,7 @@ public ReentrantLock() {
 }
 ```
 ### Lock解析
+#### 前置
 当我们调用ReentrantLock中的lock方法时会调用到这里
 ```java
 //new ReentrantLock().lock()会调用到这里
@@ -249,9 +250,15 @@ abstract boolean initialTryLock();
     - 公平锁获取
     - 非公平锁获取
 - acquire(1)：获取失败，则进入 AQS 的“排队阻塞”流程（慢路径）
-这就是典型的 fast path + slow path 设计，那我们下面来看一下非公平锁的initialTryLock
+这就是典型的 fast path + slow path 设计
+#### fast path - initialTryLock
+- 获取锁成功
+- 不进入aqs队列
+- 只做一次cas或者可重入检查
+那我们下面来看一下非公平锁的initialTryLock
 ```java
-//NofairSync
+//ReentrantLock.class
+
 final boolean initialTryLock() {  
     Thread current = Thread.currentThread();  
     
@@ -286,6 +293,10 @@ final boolean initialTryLock() {
     
 }
 ```
+#### slow path - acquire
+- 获取锁失败
+- 必须进入aqs队列
+- 线程需要park阻塞
 
 
 
