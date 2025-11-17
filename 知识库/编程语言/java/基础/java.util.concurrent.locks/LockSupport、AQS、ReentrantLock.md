@@ -256,18 +256,34 @@ final boolean initialTryLock() {
     Thread current = Thread.currentThread();  
     
     //直接尝试修改aqs中state的值
-    // 0:代表未jia'su
+    // 对于reentrantLock来说state的值代表
+    // 0:代表未加锁
+    // 1:被一个线程加锁
+    // >1:被同一个线程多次加锁
     if (compareAndSetState(0, 1)) {
+    
+        //exclusiveOwnerThread被设置为当前线程
+        //只有这个线程可以进行锁重入
         setExclusiveOwnerThread(current);  
-        return true;  
-    } else if (getExclusiveOwnerThread() == current) {  
+        return true;} 
+        
+    //如果线程持有锁，state != 0,意味着第一个if分支cas失败
+    //判断当前获取锁的线程是否为exclusiveThread
+    //如果是的话代表那么就重入该锁
+    else if (getExclusiveOwnerThread() == current) {  
+        //
         int c = getState() + 1;  
         if (c < 0) // overflow  
             throw new Error("Maximum lock count exceeded");  
         setState(c);  
-        return true;  
-    } else  
+        return true;} 
+    
+    //cas失败、重入失败，说明锁已经被其他线程持有
+    //返回false进入slow path等待锁
+    else  
         return false;  
+        
+    
 }
 ```
 
