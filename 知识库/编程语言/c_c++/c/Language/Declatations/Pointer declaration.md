@@ -1,6 +1,6 @@
 # pointer declaration
-指针是一种对象类型，指向一个函数或者另一种类型的对象，也可能不指向任何东西，这种情况由特殊的空指针值（null pointer value）表示
 ## 语法
+指针是一种对象类型，指向一个函数或者另一种类型的对象，也可能不指向任何东西，这种情况由特殊的空指针值（null pointer value）表示
 ```c
 * attr-spec-seq ﻿(optional) qualifiers ﻿(optional) declarator
 ```
@@ -28,8 +28,37 @@ mov    QWORD PTR [rbp-0x48],rax   ;p2 = &arr[0]
 lea    rax,[rbp-0x48]             
 mov    QWORD PTR [rbp-0x10],rax   ;p3 = &p2
 ```
-## const pointer、pointer const、pointer const pointer
-1. **指向常量的指针**
+## 指针中\*的含义
+- 在定义中：\*表示这个变量是指针
+```c
+int* p; //p是一个装地址的变量，这个地址存着一个int
+```
+- 在表达式中：\*表示解引用（取值）
+```c
+int  a = 10;
+int* p = &a;
+int  x = *p; //去到p指向的那块内存，把里面的值拿出来
+```
+int x = \*p对应的汇编语句
+```asm
+mov    rax,QWORD PTR [rbp-0x8]      ; 第1步：取出 p 的值（p 里存的是地址）
+mov    eax,DWORD PTR [rax]          ; 第2步：解引用 —— 取出 p 指向的内容
+mov    DWORD PTR [rbp-0xc],eax      ; 第3步：把结果写到局部变量 x
+
+```
+
+## 常见指针
+### 指针变量
+```c
+int  a = 10;  
+int* p = &a;  
+  
+printf("%p\n",  p); //变量a的地址  
+printf("%p\n", &p); //指针变量p的地址  
+printf("%d\n", *p); //对a的地址解引用
+```
+
+### 指向常量的指针
 ```c
 int a = 10, b = 20;  
 const int* c_p = &a;  
@@ -42,7 +71,7 @@ a = 1;
 - 指向的值不能修改
 - 指针本身可以改变（可以指向别的地址）
 - 可以通过a本身修改
-2. **常量指针**
+### 常量指针
 ```c
 int a = 10, b = 20;  
 int* const c_p = &a;  
@@ -54,7 +83,7 @@ int* const c_p = &a;
 ```
 - 指向的值可以修改
 - 指针本身不能改变
-3. **指向常量指针的指针**
+### 指向常量指针的指针
 ```c
 int a = 10;  
 int* const  c_p   = &a;  
