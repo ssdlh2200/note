@@ -39,7 +39,7 @@ int main(){
   vector<int> nums1{2, -1, 2};
   int res1 = s.shortestSubarray(nums1, 3);
 
-
+  cout << "hello world" << endl;
   cout << res1 << endl;
 
 
