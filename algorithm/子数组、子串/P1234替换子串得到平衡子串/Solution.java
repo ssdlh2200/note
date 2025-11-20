@@ -1,6 +1,7 @@
 public class Solution{
     public static void main(String[] args) {
         Solution solution = new Solution();
+        System.out.println("hello world");
         System.out.println(solution.balancedString1("QWER"));
         System.out.println(solution.balancedString1("QQWE"));
         System.out.println(solution.balancedString1("QQQW"));
@@ -19,7 +20,7 @@ public class Solution{
         int target = n / 4, ans = n - 1;
         int[] fre = new int[4];
         char[] index = new char[256], sArr = s.toCharArray();
-
+        
         /*词频统计*/
         index['Q'] = 0;
         index['W'] = 1;

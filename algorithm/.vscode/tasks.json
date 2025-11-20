@@ -52,8 +52,11 @@
         {
             "label": "compile and run java",
             "type": "shell",
-            "command": "javac",
+            "command": "",
             "args": [
+                "====Running Java====",
+                ";",
+                "javac",
                 "${file}",
                 "-encoding",
                 "UTF-8",
@@ -66,9 +69,16 @@
                 "${fileBasenameNoExtension}"
             ],
             "presentation": {
+                //是否显示命令本身
                 "echo": false,
+
+                //是否总是打开终端
                 "reveal": "always",
+
+                //是否获取终端焦点
                 "focus": false,
+
+                //所有任务公用一个终端
                 "panel": "shared",
                 "showReuseMessage": false,
                 "clear": false
@@ -77,17 +87,6 @@
                 "kind": "build",
                 "isDefault": false
             }
-        },
-        {
-            "label": "auto compile and run",
-            "type": "shell",
-            "command": "powershell",
-            "args": [
-                "-NoProfile",
-                "-Command",
-                "if ('${fileExtname}' -eq '.cpp') { g++ -fdiagnostics-color=always -g \"${file}\" -o \"${workspaceFolder}\\out\\${fileBasenameNoExtension}.exe\"; & \"${workspaceFolder}\\out\\${fileBasenameNoExtension}.exe\" } else { javac -encoding UTF-8 \"${file}\" -d \"${workspaceFolder}\\out\"; java -cp \"${workspaceFolder}\\out\" \"${fileBasenameNoExtension}\" }"
-            ],
-            "problemMatcher": []
         }
     ],
     "version": "2.0.0"
