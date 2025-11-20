@@ -8,6 +8,6 @@ int shortestSubarray(int* nums, int numsSize, int k) {
 
 int main()
 {
-    printf("hello world");
+    printf("hello world\n");
     return 0;
 }

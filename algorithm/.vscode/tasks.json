@@ -1,30 +1,14 @@
 {
     "tasks": [
         {
-            "label": "compile c++",
-            "type": "cppbuild",
-            "command": "E:\\developmentSoftware\\minGW\\w64devkit\\bin\\g++.exe",
-            "args": [
-                "-fdiagnostics-color=always",
-                "-g",
-                "${file}",
-                "-o",
-                "${workspaceFolder}\\out\\${fileBasenameNoExtension}.exe"
-            ],
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": false
-            },
-            "detail": "调试器生成的任务。"
-        },
-        {
             "label": "compile and run cpp",
             "type": "shell",
-            "command": "E:\\developmentSoftware\\minGW\\w64devkit\\bin\\g++.exe",
+            "command": "powershell",
             "args": [
+                "-Command",
+                "Write-Host '==== Running Cpp ====' -ForegroundColor Black -BackgroundColor Gray",
+                ";",
+                "g++",
                 "-fdiagnostics-color=always",
                 "-g",
                 "${file}",
@@ -46,15 +30,49 @@
             ],
             "group": {
                 "kind": "build",
-                "isDefault": true
+                "isDefault": false
+            }
+        },
+        {
+            "label": "compile and run c",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-Command",
+                "Write-Host '==== Running C ====' -ForegroundColor Black -BackgroundColor Gray",
+                ";",
+                "gcc",
+                "-fdiagnostics-color=always",
+                "-g",
+                "${file}",
+                "-o",
+                "${workspaceFolder}\\out\\${fileBasenameNoExtension}.exe",
+                ";",
+                "${workspaceFolder}\\out\\${fileBasenameNoExtension}.exe"
+            ],
+            "presentation": {
+                "echo": false,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": false
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
             }
         },
         {
             "label": "compile and run java",
             "type": "shell",
-            "command": "",
+            "command": "powershell",
             "args": [
-                "====Running Java====",
+                "-Command",
+                "Write-Host '==== Running Java ====' -ForegroundColor Black -BackgroundColor Gray",
                 ";",
                 "javac",
                 "${file}",
@@ -71,13 +89,10 @@
             "presentation": {
                 //是否显示命令本身
                 "echo": false,
-
                 //是否总是打开终端
                 "reveal": "always",
-
                 //是否获取终端焦点
                 "focus": false,
-
                 //所有任务公用一个终端
                 "panel": "shared",
                 "showReuseMessage": false,
