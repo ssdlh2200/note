@@ -1,6 +1,37 @@
 {
     "tasks": [
         {
+            "label": "compile cpp",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-Command",
+                "Write-Host '==== Compile Cpp ====' -ForegroundColor Black -BackgroundColor Gray",
+                ";",
+                "g++",
+                "-fdiagnostics-color=always",
+                "-g",
+                "${file}",
+                "-o",
+                "${workspaceFolder}\\out\\${fileBasenameNoExtension}.exe",
+            ],
+            "presentation": {
+                "echo": false,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": false
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
             "label": "compile and run cpp",
             "type": "shell",
             "command": "powershell",
@@ -33,6 +64,7 @@
                 "isDefault": false
             }
         },
+
         {
             "label": "compile and run c",
             "type": "shell",

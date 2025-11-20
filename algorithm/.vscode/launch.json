@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "debug c++",
+            "name": "debug cpp",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}\\out\\${fileBasenameNoExtension}.exe",
@@ -13,7 +13,7 @@
             "externalConsole": false,
 
             //调试前执行编译源文件
-            "preLaunchTask": "compile c++",
+            "preLaunchTask": "compile cpp",
             "setupCommands": [
                 {
                     "description": "为 gdb 启用整齐打印",
