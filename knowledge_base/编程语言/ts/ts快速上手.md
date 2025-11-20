@@ -61,8 +61,25 @@ function add(a: number, b: number):number{
 声明b为hello，以后b中只能存储hello，不能存储其他类型的数据
 ```ts
 let b: 'hello'
+
 b = 'hello'
+
+b = 'word' // ❌ 编译报错
 ```
+### 联合类型
+联合类型可以允许变量是多个类型
+```ts
+let value: string | number;
+```
+value既可以是string类型，也可以是number类型
+联合类型也可以针对字面量类型
+```ts
+let value: 'hello' | 'hi'
+
+value = 'hello'
+value = 'hi'
+```
+
 ## 3. 类型推断
 当我们给a赋值为10的时候，ts已经将变量a推断为number类型，此后不能将boolean类型赋值给变量a
 ```ts

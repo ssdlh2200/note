@@ -21,7 +21,7 @@
             "detail": "调试器生成的任务。"
         },
         {
-            "label": "compile and run c++",
+            "label": "compile and run cpp",
             "type": "shell",
             "command": "E:\\developmentSoftware\\minGW\\w64devkit\\bin\\g++.exe",
             "args": [
