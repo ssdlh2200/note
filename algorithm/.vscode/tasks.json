@@ -1,8 +1,8 @@
 {
     "tasks": [
         {
-            "type": "cppbuild",
             "label": "compile c++",
+            "type": "cppbuild",
             "command": "E:\\developmentSoftware\\minGW\\w64devkit\\bin\\g++.exe",
             "args": [
                 "-fdiagnostics-color=always",
@@ -20,10 +20,9 @@
             },
             "detail": "调试器生成的任务。"
         },
-
         {
+            "label": "compile and run c++",
             "type": "shell",
-            "label": "compile and start c++",
             "command": "E:\\developmentSoftware\\minGW\\w64devkit\\bin\\g++.exe",
             "args": [
                 "-fdiagnostics-color=always",
@@ -49,6 +48,46 @@
                 "kind": "build",
                 "isDefault": true
             }
+        },
+        {
+            "label": "compile and run java",
+            "type": "shell",
+            "command": "javac",
+            "args": [
+                "${file}",
+                "-encoding",
+                "UTF-8",
+                "-d",
+                "${workspaceFolder}\\out",
+                ";",
+                "java",
+                "-cp",
+                "${workspaceFolder}\\out",
+                "${fileBasenameNoExtension}"
+            ],
+            "presentation": {
+                "echo": false,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": false
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "auto compile and run",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-NoProfile",
+                "-Command",
+                "if ('${fileExtname}' -eq '.cpp') { g++ -fdiagnostics-color=always -g \"${file}\" -o \"${workspaceFolder}\\out\\${fileBasenameNoExtension}.exe\"; & \"${workspaceFolder}\\out\\${fileBasenameNoExtension}.exe\" } else { javac -encoding UTF-8 \"${file}\" -d \"${workspaceFolder}\\out\"; java -cp \"${workspaceFolder}\\out\" \"${fileBasenameNoExtension}\" }"
+            ],
+            "problemMatcher": []
         }
     ],
     "version": "2.0.0"

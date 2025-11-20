@@ -1,5 +1,3 @@
-package DLeetcode.数据结构与算法.滑动窗口.P1234替换子串得到平衡子串;
-
 public class Solution{
     public static void main(String[] args) {
         Solution solution = new Solution();
