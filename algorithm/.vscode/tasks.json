@@ -1,6 +1,42 @@
 {
     "tasks": [
         {
+            "label": "compile and run cpp",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-Command",
+                "Write-Host '==== Running Cpp-MSVC====' -ForegroundColor Black -BackgroundColor Gray",
+                ";",
+                //cl /EHsc /source-charset:utf-8 /execution-charset:utf-8 /Fe:solution.exe solution.cpp
+                "cl",
+                "/EHsc",
+                "/nologo",
+                "/source-charset:utf-8",
+                "/execution-charset:utf-8",
+                "/Fo:${workspaceFolder}\\out\\${fileBasenameNoExtension}.obj",
+                "/Fe:${workspaceFolder}\\out\\${fileBasenameNoExtension}.exe",
+                "${file}",
+                ";",
+                "${workspaceFolder}\\out\\${fileBasenameNoExtension}.exe",
+            ],
+            "presentation": {
+                "echo": false,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": false
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
             "label": "compile cpp",
             "type": "shell",
             "command": "powershell",
@@ -31,6 +67,7 @@
                 "isDefault": false
             }
         },
+        /* mingw
         {
             "label": "compile and run cpp",
             "type": "shell",
@@ -63,8 +100,8 @@
                 "kind": "build",
                 "isDefault": false
             }
-        },
-
+        }, 
+        */
         {
             "label": "compile and run c",
             "type": "shell",
