@@ -67,8 +67,21 @@ public:
     deque<int>  deq;
 
     for (int i = 0; i < nums.size(); i++){
-      while(!deq.empty() && deq.back() >=1){}
+      while(!deq.empty() && nums[deq.back()] > nums[deq.front()]){
+        deq.pop_front();
+      }
+      deq.push_back(i);
+
+      if(i-deq.front() >= k){
+        deq.pop_front();
+      }
+
+      if(i>=k-1){
+        cout << "i:" << deq.front() << " nums[i]:" << nums[deq.front()] << endl;
+        res.push_back(nums[deq.front()]);
+      }
     }
+    return res;
   }
 
 
@@ -80,7 +93,7 @@ int main(){
   vector<int> res = Solution().maxSlidingWindow(nums, 3); 
 
   for (int i : res){
-    cout << i << endl;
+    //cout << i << endl;
   }
 
 
