@@ -21,7 +21,8 @@
 			"unordered_map": "cpp",
 			"xhash": "cpp",
 			"utility": "cpp",
-			"xutility": "cpp"
+			"xutility": "cpp",
+			"solution": "cpp"
 		},
 		"codeRun.launchs": {
 			"cpp": "debug c/cpp msvc",
