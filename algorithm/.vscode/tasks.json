@@ -11,9 +11,11 @@
                 //cl /EHsc /source-charset:utf-8 /execution-charset:utf-8 /Fe:solution.exe solution.cpp
                 "cl",
                 "/EHsc",
+                "/Zi",
                 "/nologo",
                 "/source-charset:utf-8",
                 "/execution-charset:utf-8",
+                "/Fd:${workspaceFolder}\\out\\${fileBasenameNoExtension}.pdb",
                 "/Fo:${workspaceFolder}\\out\\${fileBasenameNoExtension}.obj",
                 "/Fe:${workspaceFolder}\\out\\${fileBasenameNoExtension}.exe",
                 "${file}",

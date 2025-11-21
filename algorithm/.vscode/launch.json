@@ -2,30 +2,32 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "debug cpp",
-            "type": "cppdbg",
+            "name": "debug c/cpp msvc",
+            "type": "cppvsdbg",
             "request": "launch",
             "program": "${workspaceFolder}\\out\\${fileBasenameNoExtension}.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}\\out\\",
             "environment": [],
-            "externalConsole": false,
-
+            
             //调试前执行编译源文件
             "preLaunchTask": "compile c/cpp msvc",
-            "setupCommands": [
-                {
-                    "description": "为 gdb 启用整齐打印",
-                    "text": "-enable-pretty-printing",
-                    "ignoreFailures": true
-                },
-                {
-                    "description": "将反汇编风格设置为 Intel",
-                    "text": "-gdb-set disassembly-flavor intel",
-                    "ignoreFailures": true
-                }
-            ]
+            
+            "logging": {
+                
+                "moduleLoad": false,
+                "engineLogging": false,
+                "programOutput": false
+            },
+            
+
+            "console": "integratedTerminal",
+            //不会自动聚焦调试控制台
+            "internalConsoleOptions": "neverOpen"
+            
+            
         }
+        
     ]
 }

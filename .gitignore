@@ -5,6 +5,8 @@
 # c编译
 *.obj
 *.exe
+*.ilk
+*.pdb
 
 # java
 *.class

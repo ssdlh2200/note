@@ -18,12 +18,16 @@
 			"iostream": "cpp",
 			"ostream": "cpp"
 		},
-		"runCodeByTask.labels": {
+		"codeRun.launchs": {
+			"cpp": "debug c/cpp msvc",
+			"c": "debug c/cpp msvc",
+		},
+		"codeRun.tasks": {
 			"cpp": "run c/cpp",
 			"c": "run c/cpp",
 			"java": "compile and run java"
-		}
-	
+		},
+
 		
-	}
+	},
 }
