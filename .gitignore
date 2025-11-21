@@ -7,3 +7,6 @@
 
 # java
 *.class
+
+# idea
+.idea

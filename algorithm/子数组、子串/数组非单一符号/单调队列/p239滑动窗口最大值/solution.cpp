@@ -67,17 +67,28 @@ public:
     deque<int>  deq;
 
     for (int i = 0; i < nums.size(); i++){
-      while(!deq.empty() && nums[deq.back()] > nums[deq.front()]){
-        deq.pop_front();
+
+
+      //等号为了防止出现1 2 3 3 2 2 2这种情况，但是等号又出现个新问题，会让当前队列元素出光
+      //如果入队的元素比队尾元素大，那么需要把他放在队首
+      while(!deq.empty() && nums[i] >= nums[deq.back()]){
+        deq.pop_back();
       }
+      /*为什么入队列在出队列的后面？
+       *因为要先维护队列的单调性,如果队列中先有一个3，当后面要把4插入队列时
+       *因为while中已经将4挪到队首，仍然是最大值
+       */
       deq.push_back(i);
 
-      if(i-deq.front() >= k){
+      /*
+       *对于每一个队首元素检查当前是否超出窗口
+       */
+      if(i - deq.front() >= k){
         deq.pop_front();
       }
 
       if(i>=k-1){
-        cout << "i:" << deq.front() << " nums[i]:" << nums[deq.front()] << endl;
+        //cout << "i:" << deq.front() << " nums[i]:" << nums[deq.front()] << endl;
         res.push_back(nums[deq.front()]);
       }
     }
@@ -89,11 +100,18 @@ public:
 
 
 int main(){
-  vector<int> nums{1,3,-1,-3,5,3,6,7};
-  vector<int> res = Solution().maxSlidingWindow(nums, 3); 
-
-  for (int i : res){
-    //cout << i << endl;
+  vector<int> nums1{1,3,-1,-3,5,3,6,7};
+  vector<int> nums2{3, 1, 1, 3};
+  vector<int> nums3{7, 2, 4};
+  vector<int> res1 = Solution().maxSlidingWindow(nums1, 3);
+  vector<int> res2 = Solution().maxSlidingWindow(nums2, 3);
+  vector<int> res3 = Solution().maxSlidingWindow(nums3, 2);
+  for (int i : res1){
+    cout << i << endl;
+  }
+  cout << endl;
+  for (int i: res2) {
+    cout << i << endl;
   }
 
 
