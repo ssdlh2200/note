@@ -1,12 +1,12 @@
 {
     "tasks": [
         {
-            "label": "compile and run cpp",
+            "label": "compile c/cpp msvc",
             "type": "shell",
             "command": "powershell",
             "args": [
                 "-Command",
-                "Write-Host '==== Running Cpp-MSVC====' -ForegroundColor Black -BackgroundColor Gray",
+                "Write-Host '==== Compiling C/Cpp-MSVC ====' -ForegroundColor Black -BackgroundColor Gray",
                 ";",
                 //cl /EHsc /source-charset:utf-8 /execution-charset:utf-8 /Fe:solution.exe solution.cpp
                 "cl",
@@ -17,8 +17,6 @@
                 "/Fo:${workspaceFolder}\\out\\${fileBasenameNoExtension}.obj",
                 "/Fe:${workspaceFolder}\\out\\${fileBasenameNoExtension}.exe",
                 "${file}",
-                ";",
-                "${workspaceFolder}\\out\\${fileBasenameNoExtension}.exe",
             ],
             "presentation": {
                 "echo": false,
@@ -29,7 +27,7 @@
                 "clear": false
             },
             "problemMatcher": [
-                "$gcc"
+                "$msCompile"
             ],
             "group": {
                 "kind": "build",
@@ -37,19 +35,15 @@
             }
         },
         {
-            "label": "compile cpp",
+            "label": "run c/cpp",
+            "dependsOn": "compile c/cpp msvc",
             "type": "shell",
             "command": "powershell",
             "args": [
                 "-Command",
-                "Write-Host '==== Compile Cpp ====' -ForegroundColor Black -BackgroundColor Gray",
+                "Write-Host '==== Running C/Cpp ====' -ForegroundColor Black -BackgroundColor Gray",
                 ";",
-                "g++",
-                "-fdiagnostics-color=always",
-                "-g",
-                "${file}",
-                "-o",
-                "${workspaceFolder}\\out\\${fileBasenameNoExtension}.exe",
+                "${workspaceFolder}\\out\\${fileBasenameNoExtension}.exe"
             ],
             "presentation": {
                 "echo": false,
@@ -60,13 +54,14 @@
                 "clear": false
             },
             "problemMatcher": [
-                "$gcc"
+                "$msCompile"
             ],
             "group": {
                 "kind": "build",
                 "isDefault": false
             }
         },
+
         /* mingw
         {
             "label": "compile and run cpp",
@@ -102,7 +97,7 @@
             }
         }, 
         */
-        {
+/*         {
             "label": "compile and run c",
             "type": "shell",
             "command": "powershell",
@@ -134,7 +129,8 @@
                 "kind": "build",
                 "isDefault": false
             }
-        },
+        }, */
+
         {
             "label": "compile and run java",
             "type": "shell",
@@ -170,7 +166,7 @@
             "group": {
                 "kind": "build",
                 "isDefault": false
-            }
+            },
         }
     ],
     "version": "2.0.0"

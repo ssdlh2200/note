@@ -13,7 +13,7 @@
             "externalConsole": false,
 
             //调试前执行编译源文件
-            "preLaunchTask": "compile cpp",
+            "preLaunchTask": "compile c/cpp msvc",
             "setupCommands": [
                 {
                     "description": "为 gdb 启用整齐打印",

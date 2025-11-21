@@ -1,0 +1,29 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		}
+	],
+	"settings": {
+		"terminal.integrated.defaultProfile.windows": "PowerShell",
+		"workbench.colorCustomizations": {
+			//终端颜色搭配
+			"terminal.background": "#1e1e2e",
+			"terminal.foreground": "#cdd6f4",
+			//编辑器下方的区域:包括问题，输出，调试控制台，端口这些面板
+			"panel.background": "#1e1e2e",
+			"panelTitle.activeForeground": "#cdd6f4",
+		},
+		"files.associations": {
+			"iostream": "cpp",
+			"ostream": "cpp"
+		},
+		"runCodeByTask.labels": {
+			"cpp": "run c/cpp",
+			"c": "run c/cpp",
+			"java": "compile and run java"
+		}
+	
+		
+	}
+}

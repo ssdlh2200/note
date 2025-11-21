@@ -1,4 +1,3 @@
-package com.ssdlh.algorithm.双指针.去除重复元素.P27移除元素;
 
 public class Solution {
     public static void main(String[] args) {
