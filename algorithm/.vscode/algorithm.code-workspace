@@ -16,7 +16,12 @@
 		},
 		"files.associations": {
 			"iostream": "cpp",
-			"ostream": "cpp"
+			"ostream": "cpp",
+			"vector": "cpp",
+			"unordered_map": "cpp",
+			"xhash": "cpp",
+			"utility": "cpp",
+			"xutility": "cpp"
 		},
 		"codeRun.launchs": {
 			"cpp": "debug c/cpp msvc",

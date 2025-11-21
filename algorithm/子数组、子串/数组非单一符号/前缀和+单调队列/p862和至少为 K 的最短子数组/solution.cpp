@@ -35,32 +35,40 @@ public:
   //前缀和+单调队列
   int shortestSubarray(vector<int>& nums, int k) {
 
-    deque<int> prefix_sum_deq{0};
+    deque<long long> prefix_sum_deq{0};
+    unordered_map<int, int> prefix_deq_idx{{0, -1}};
 
-    
-    int prefix_sum;
-    
+    long long prefix_sum = 0;
+    int res = 100001;
 
     for (int i = 0; i < nums.size(); i++){
       prefix_sum += nums[i];
-      while(!prefix_sum_deq.empty() && nums[i] <= nums[prefix_sum_deq.front()]){
-
-
+      
+      while(!prefix_sum_deq.empty() && (prefix_sum - prefix_sum_deq.front()) >= k){
+        int temp = i - prefix_deq_idx[prefix_sum_deq.front()];
+        res = res < temp ? res : temp;
+        prefix_sum_deq.pop_front();
       }
 
-
+      while(!prefix_sum_deq.empty() && prefix_sum <= prefix_sum_deq.back()){
+        prefix_sum_deq.pop_back();
+      }
+      prefix_deq_idx[prefix_sum] = i;
+      prefix_sum_deq.push_back(prefix_sum);
     }
 
-    return 0;
+
+    return res == 100001 ? -1 : res;
   }
 
 };
 int main(){
 
   Solution s;
-  cout << "hello world" << endl;
+
   vector<int> nums1{2, -1, 2};
   int res1 = s.shortestSubarray(nums1, 3);
 
   cout << res1 << endl;
+  cout << sizeof(long) <<endl;
 }
