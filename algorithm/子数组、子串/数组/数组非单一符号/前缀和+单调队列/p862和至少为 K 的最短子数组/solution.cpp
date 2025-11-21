@@ -35,8 +35,8 @@ public:
   //前缀和+单调队列
   int shortestSubarray(vector<int>& nums, int k) {
 
-    deque<long long> prefix_sum_deq{0};
-    unordered_map<int, int> prefix_deq_idx{{0, -1}};
+    deque<long long> deq{0};
+    unordered_map<int, int> idx{{0, -1}};
 
     long long prefix_sum = 0;
     int res = 100001;
@@ -44,19 +44,37 @@ public:
     for (int i = 0; i < nums.size(); i++){
       prefix_sum += nums[i];
       
-      while(!prefix_sum_deq.empty() && (prefix_sum - prefix_sum_deq.front()) >= k){
-        int temp = i - prefix_deq_idx[prefix_sum_deq.front()];
+      while(!deq.empty() && (prefix_sum - deq.front()) >= k){
+        int temp = i - idx[deq.front()];
         res = res < temp ? res : temp;
-        prefix_sum_deq.pop_front();
+        deq.pop_front();
       }
 
-      while(!prefix_sum_deq.empty() && prefix_sum <= prefix_sum_deq.back()){
-        prefix_sum_deq.pop_back();
+      while(!deq.empty() && prefix_sum <= deq.back()){
+        deq.pop_back();
       }
-      prefix_deq_idx[prefix_sum] = i;
-      prefix_sum_deq.push_back(prefix_sum);
+      idx[prefix_sum] = i;
+      deq.push_back(prefix_sum);
     }
+    return res == 100001 ? -1 : res;
+  }
+  int shortestSubarray(vector<int>& nums, int k){
+    deque<pair<long long, int>> deq{{0,-1}};
+    long long prefix_sum = 0;
+    int res = 100001;
 
+    for (int i = 0; i < nums.size(); i++){
+      prefix_sum += nums[i];
+
+      while(!deq.empty() && (prefix_sum - deq.front().first) >= k){
+        res = min(res, i - deq.front().second);
+        deq.pop_front();
+      }
+      while(!deq.empty() && prefix_sum <= deq.back().first){
+        deq.pop_back();
+      }
+      deq.push_back({prefix_sum, i});
+    }
 
     return res == 100001 ? -1 : res;
   }
