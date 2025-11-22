@@ -114,10 +114,15 @@ end main
 ### L
 #### lea
 ```asm
-lea 目的寄存器, 源操作数
+lea 目的寄存器, 内存地址表达式
 ```
 - 目的寄存器：rax，rbx，rcx
-- 源操作数：内存地址表达式（不会访问内存，只计算地址）
+- 内存地址表达式：不会访问内存，只计算地址
+<div style="background-color: #ffe4e1; padding: 10px; border-left: 4px solid #f1c40f;color: black" >
+在x86汇编中，[]通常代表内存访问，例如：mov rax, [0x1234]，取出地址0x1234处的值赋给rax寄存器。
+<br/>
+但是lea不一样，lea rax,[0x1234]，不会访问0x1234地址处的值，而是将0x1234地址赋值给rax
+</div>
 【例1】
 ```c
 int a;
