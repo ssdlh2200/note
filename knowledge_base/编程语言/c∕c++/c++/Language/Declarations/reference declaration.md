@@ -1,33 +1,61 @@
 # reference declaration
 ## 语法
 c++声明允许定义具名变量，使其成为引用，也就是**某个已存在对象或函数的别名**
-```cpp
-& attr(optional) declarator
 
-&& attr(optional) declarator
-```
-- **左值引用**
-```cpp
-S& D; //D是一个左值引用，引用的类型由声明说明符序列S决定
-```
-- **右值引用**
-```cpp
-S&& D; //D是一个右值引用，引用的类型由声明说明符序列S决定
-```
-
+| **& attr(optional) declarator**  | (1) |               |
+| -------------------------------- | --- | ------------- |
+| **&& attr(optional) declarator** | (2) | (since C++11) |
+- 左值引用声明：S& D
+    - D是一个左值引用，引用的类型由声明说明符序列S决定
+- 右值引用声明：S&& D
+    - D是一个右值引用，引用的类型由声明说明符序列S决定
+- declarator
+    - 不能是引用声明，数组声明，指针声明
+- attr
+    - 可选属性列表，例如nodiscard
 ```cpp
 声明说明符序列S
 
-int& r;                     // s -> int
+int& r;                     // S -> int
 
-const int& r;               // s -> const int
+const int& r;               // S -> const int
 
-unsigned volatile int& ref; // s -> unsigned volatile int
+unsigned volatile int& ref; // S -> unsigned volatile int
 ```
-注意点：
-1. 引用必须初始化
-2. 不能形成引用void
-3. 引用类型不能被cv限定
+
+## 引用声明注意点
+- 引用必须初始化
+```cpp
+int& ref;  //❌不能只有声明，必须初始话
+```
+- 不能声明void的引用类型
+```cpp
+void& ref; //❌
+```
+- 引用绑定的对象可以是const或volatile，但引用本身不能是const或volatile
+```cpp
+int x = 10;  
+int& ref1 = x;        //ref1一个int的引用
+const int& ref2 = x;  //ref2一个const int的引用
+
+  
+int& const r = x;      // ❌ 错误：引用不能 const
+int& volatile r2 = x;  // ❌ 错误：引用不能 volatile
+int& const volatile r3 = x; // ❌ 错误
+```
+- 引用不是对象
+    1. 不一定占用存储空间
+    2. 编译器可能为了实现语义分配空间
+- c++不允许把引用在进行一层引用，数组化指针化
+    1. 不存在引用的引用
+    2. 不存在引用数组
+    3. 不存在指向引用的指针
+```cpp
+int& a[3]; // ❌error
+int&* p;   // ❌error
+int& &r;   // ❌error
+```
+
 ## 左值、左值引用
 ### 左值(Lvalue)
 - 具有地址，存储在内存中
