@@ -78,6 +78,7 @@ mov    QWORD PTR [rbp-0x8],rax
 ```
 ## 右值、右值引用
 ### 右值(Rvalue)
+- 右值引用可以延长临时对象的生命周期
 - 通常没有地址，存储在寄存器或者临时内存中
 - 不能出现在等号左侧
 - 不能取地址&（除非绑定到const左值引用）
@@ -164,3 +165,42 @@ rref&& r4 = 1; // r4 的类型是 int&&
 |`&&` + `&&`|`&&`|
 
 一句话：总结**只要有左值引用 `&`，结果就是左值引用；只有两个都是右值引用时才是右值引用**
+## 函数调用
+- 右值引用变量也是一个左值
+```cpp
+#include <iostream>
+#include <utility>
+ 
+void f(int& x)
+{
+    [std::cout](https://www.en.cppreference.com/w/cpp/io/cout.html) << "lvalue reference overload f(" << x << ")\n";
+}
+ 
+void f(const int& x)
+{
+    [std::cout](https://www.en.cppreference.com/w/cpp/io/cout.html) << "lvalue reference to const overload f(" << x << ")\n";
+}
+ 
+void f(int&& x)
+{
+    [std::cout](https://www.en.cppreference.com/w/cpp/io/cout.html) << "rvalue reference overload f(" << x << ")\n";
+}
+ 
+int main()
+{
+    int i = 1;
+    const int ci = 2;
+ 
+    f(i);  // calls f(int&)
+    f(ci); // calls f(const int&)
+    f(3);  // calls f(int&&)
+           // would call f(const int&) if f(int&&) overload wasn't provided
+    f(std::move(i)); // calls f(int&&)
+ 
+    // rvalue reference variables are lvalues when used in expressions
+    int&& x = 1;
+    f(x);            // calls f(int& x)
+    f(std::move(x)); // calls f(int&& x)
+}
+```
+## 等待添加....
