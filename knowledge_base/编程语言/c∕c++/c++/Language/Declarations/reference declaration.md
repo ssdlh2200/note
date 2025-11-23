@@ -23,39 +23,6 @@ const int& r;               // S -> const int
 unsigned volatile int& ref; // S -> unsigned volatile int
 ```
 
-## 引用声明注意点
-- 引用必须初始化
-```cpp
-int& ref;  //❌不能只有声明，必须初始话
-```
-- 不能声明void的引用类型
-```cpp
-void& ref; //❌
-```
-- 引用绑定的对象可以是const或volatile，但引用本身不能是const或volatile
-```cpp
-int x = 10;  
-int& ref1 = x;        //ref1一个int的引用
-const int& ref2 = x;  //ref2一个const int的引用
-
-  
-int& const r = x;      // ❌ 错误：引用不能 const
-int& volatile r2 = x;  // ❌ 错误：引用不能 volatile
-int& const volatile r3 = x; // ❌ 错误
-```
-- 引用不是对象
-    1. 不一定占用存储空间
-    2. 编译器可能为了实现语义分配空间
-- c++不允许把引用在进行一层引用，数组化指针化
-    1. 不存在引用的引用
-    2. 不存在引用数组
-    3. 不存在指向引用的指针
-```cpp
-int& a[3]; // ❌error
-int&* p;   // ❌error
-int& &r;   // ❌error
-```
-
 ## 左值、左值引用
 ### 左值(Lvalue)
 - 具有地址，存储在内存中
@@ -70,7 +37,7 @@ int a = 10;  //a是左值
 mov DWORD PTR [rbp-0x4],0xa //可以看到变量a是具有地址的
 ```
 ### 左值引用
-#### 非const左值引用
+- **非const左值引用**
 ```cpp
 int a = 10;
 int &ref = a;
@@ -97,7 +64,8 @@ int main(){
 不过在c++语言层面无法得到引用本身的地址，c++编译器当我们使用&ref会自动转为变量a的地址，但我们可以在x64dbg中查看
 ![[20251123-04-08-19.png]]
 我们可以看到rbp-8=0xb695fff7c8，也就是引用的地址中存储的是变量a的地址(小端存储还原后为：)000000b695fff7c4
-#### const左值引用
+
+- **const左值引用**
 左值引用通常要配合左值使用，但我们可以通过const配合右值使用
 ```cpp
 //const左值引用配合右值使用
@@ -135,3 +103,68 @@ mov    QWORD PTR [rbp-0x10],rax
 - 移动语义（std::move 的底层）
 - 完美转发（forward<T&&>）
 - 修改临时对象（比如写入 buffer）
+
+## 引用声明注意点
+- 引用必须初始化
+```cpp
+int& ref;  //❌不能只有声明，必须初始话
+```
+- 不能声明void的引用类型
+```cpp
+void& ref; //❌
+```
+- 引用绑定的对象可以是const或volatile，但引用本身不能是const或volatile
+```cpp
+int x = 10;  
+int& ref1 = x;        //ref1一个int的引用
+const int& ref2 = x;  //ref2一个const int的引用
+
+  
+int& const r = x;      // ❌ 错误：引用不能 const
+int& volatile r2 = x;  // ❌ 错误：引用不能 volatile
+int& const volatile r3 = x; // ❌ 错误
+```
+- 引用不是对象
+    1. 不一定占用存储空间
+    2. 编译器可能为了实现语义分配空间
+- c++不允许把引用在进行一层引用，数组化指针化
+    1. 不存在引用的引用
+    2. 不存在引用数组
+    3. 不存在指向引用的指针
+```cpp
+int& a[3]; // ❌error
+int&* p;   // ❌error
+int& &r;   // ❌error
+```
+
+## 引用折叠
+c++不允许直接声明引用的引用
+```cpp
+int& &  //错误
+int&& & //错误
+```
+但是通过模板或者typedef却可以间接产生引用的引用
+```cpp
+typedef int&  lref;
+typedef int&& rref;
+int n;
+
+lref&  r1 = n; // r1 的类型是 int&
+lref&& r2 = n; // r2 的类型是 int&
+rref&  r3 = n; // r3 的类型是 int&
+rref&& r4 = 1; // r4 的类型是 int&&
+```
+
+
+
+
+**⭐核心规则**
+
+|组合|结果|
+|---|---|
+|`&` + `&`|`&`|
+|`&` + `&&`|`&`|
+|`&&` + `&`|`&`|
+|`&&` + `&&`|`&&`|
+
+一句话：总结**只要有左值引用 `&`，结果就是左值引用；只有两个都是右值引用时才是右值引用**
