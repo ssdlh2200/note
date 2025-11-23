@@ -42,7 +42,7 @@ int a = 10;  //a是左值
 mov DWORD PTR [rbp-0x4],0xa //可以看到变量a是具有地址的
 ```
 ### 左值引用
-#### 非const左值
+#### 非const左值引用
 ```cpp
 int a = 10;
 int &ref = a;
@@ -69,14 +69,17 @@ int main(){
 不过在c++语言层面无法得到引用本身的地址，c++编译器当我们使用&ref会自动转为变量a的地址，但我们可以在x64dbg中查看
 ![[20251123-04-08-19.png]]
 我们可以看到rbp-8=0xb695fff7c8，也就是引用的地址中存储的是变量a的地址(小端存储还原后为：)000000b695fff7c4
-#### const左值
+#### const左值引用
 左值引用通常要配合左值使用，但我们可以通过const配合右值使用
 ```cpp
-//左值引用通常要配合左值
-const int& ref = 10;
+//const左值引用配合右值使用
+const int& ref = 0xcafe;
 
+//反汇编如下：
+mov    DWORD PTR [rbp-0xc],0xcafe  
+lea    rax,[rbp-0xc]              
+mov    QWORD PTR [rbp-0x8],rax
 ```
-
 ## 右值、右值引用
 ### 右值(Rvalue)
 - 通常没有地址，存储在寄存器或者临时内存中
@@ -88,3 +91,19 @@ int x = 10;   //10是右值
 int y = 10+5; //10+5是右值
 ```
 ### 右值引用
+```cpp
+int&& ref1 = 0xcafe;  
+const int&& ref2 = 0xcaff; //这种写法很不常见，违背了右值引用的设计理念
+
+//反汇编如下
+mov    DWORD PTR [rbp-0x14],0xcafe  
+lea    rax,[rbp-0x14]             
+mov    QWORD PTR [rbp-0x8],rax    
+mov    DWORD PTR [rbp-0x18],0xcaff  
+lea    rax,[rbp-0x18]             
+mov    QWORD PTR [rbp-0x10],rax
+```
+✔右值引用本来的用途
+- 移动语义（std::move 的底层）
+- 完美转发（forward<T&&>）
+- 修改临时对象（比如写入 buffer）
