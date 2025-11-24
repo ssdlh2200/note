@@ -175,13 +175,13 @@ extern MessageBoxA: proc
 
 .CODE
 main PROC
-
     ; 函数开始,保存上层函数栈基指针,以便能够返回
     push rbp
     ; 将栈顶指针作为当前的栈基指针
     mov rbp,rsp
-    ; 为当前函数分配0个字节(没有存储临时变量的需求)
-    sub rsp,0h
+    ; 为当前函数分配16个字节
+    sub rsp,10h
+
 
     ; windows abi调用约定rcx、rdx、r8、r9存储函数调用的1，2，3，4参数
     ; MessageBoxA(NULL, 弹窗内容, 弹窗标题, MB_OK)
@@ -191,15 +191,18 @@ main PROC
     mov r9d, 0
     call MessageBoxA
 
+
     ; 恢复栈帧
     mov rsp,rbp
     pop rbp
     ret
+
 main ENDP
 END
 
 ; ml64 test.asm /c
-; link test.obj /subsystem:windows  /LIBPATH:"E:\Windows Kits\10\Lib\10.0.19041.0\um\x64" User32.Lib kernel32.Lib /entry:main
+; link test.obj /subsystem:windows  /LIBPATH:"E:\Windows Kits\10\Lib\10.0.19041.0\um\x64" User32.Lib kernel32.Lib /entry:main /map
 ```
 - ml64、link：在visual studio的msvc工具包下
+    - map参数能打印内存段到.map文件
 - user32.lib和kernel32.lib：在visual studio下载时的windows 10kits工具包下
