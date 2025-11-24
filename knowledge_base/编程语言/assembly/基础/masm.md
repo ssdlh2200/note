@@ -165,3 +165,41 @@ debug 源程序.exe
 | **Q**             | Quit       | 退出 DEBUG             |
 
 ## masm(x64)
+### hello world
+```asm
+.DATA
+    win_title db 'Hello Title', 0
+    win_message db 'Hello, world!', 0
+
+extern MessageBoxA: proc
+
+.CODE
+main PROC
+
+    ; 函数开始,保存上层函数栈基指针,以便能够返回
+    push rbp
+    ; 将栈顶指针作为当前的栈基指针
+    mov rbp,rsp
+    ; 为当前函数分配0个字节(没有存储临时变量的需求)
+    sub rsp,0h
+
+    ; windows abi调用约定rcx、rdx、r8、r9存储函数调用的1，2，3，4参数
+    ; MessageBoxA(NULL, 弹窗内容, 弹窗标题, MB_OK)
+    mov ecx, 0
+    mov rdx, offset win_message
+    mov r8,  offset win_title
+    mov r9d, 0
+    call MessageBoxA
+
+    ; 恢复栈帧
+    mov rsp,rbp
+    pop rbp
+    ret
+main ENDP
+END
+
+; ml64 test.asm /c
+; link test.obj /subsystem:windows  /LIBPATH:"E:\Windows Kits\10\Lib\10.0.19041.0\um\x64" User32.Lib kernel32.Lib /entry:main
+```
+- ml64、link：在visual studio的msvc工具包下
+- user32.lib和kernel32.lib：在visual studio下载时的windows 10kits工具包下
