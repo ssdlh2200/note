@@ -193,7 +193,7 @@ main PROC
 
 
     ; 恢复栈帧
-    mov rsp,rbp
+    add rsp,10h
     pop rbp
     ret
 
