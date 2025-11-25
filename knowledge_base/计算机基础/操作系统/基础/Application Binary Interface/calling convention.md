@@ -49,3 +49,19 @@
         - 前四个浮点参数通过 XMM0-XMM3 传递
         - 多余参数通过栈传递
 ### 栈帧创建、销毁
+```asm
+//prologue栈帧创建
+
+push rbp
+mov rbp, rsp
+sub rsp, N
+
+...
+...
+...
+
+//epilogue栈帧销毁
+
+add rsp, N
+pop rbp
+```
