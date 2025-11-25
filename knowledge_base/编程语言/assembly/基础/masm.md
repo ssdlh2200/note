@@ -1,5 +1,5 @@
 # masm
-## masm(5.0)
+## masm(x86_16)
 ### asm文件格式
 - 汇编源代码，包括：
     1. 段定义（Segment）
@@ -13,7 +13,7 @@
     - 操作数（Operand）
     - 注释（以 `;` 开头）
 
-#### 伪指令
+### 伪指令
 ```asm
 assume cs:hello
 hello segment
@@ -164,7 +164,7 @@ debug 源程序.exe
 | **O 端口 数据**       | Output     | 向 I/O 端口输出一个字节       |
 | **Q**             | Quit       | 退出 DEBUG             |
 
-## masm(x64)
+## masm(x86_64)
 ### hello world
 ```asm
 .DATA
@@ -206,3 +206,5 @@ END
 - ml64、link：在visual studio的msvc工具包下
     - map参数能打印内存段到.map文件
 - user32.lib和kernel32.lib：在visual studio下载时的windows 10kits工具包下
+### .CODE
+#### struct

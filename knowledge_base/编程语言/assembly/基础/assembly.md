@@ -31,7 +31,7 @@ AT&T 风格：addl $1, %eax
 ❌ 结果不相同
 ```
 
-## 8086
+## x86_16
 ### mov 数据传送指令
 ```
 MOV 目的操作数, 源操作数
@@ -110,7 +110,7 @@ end main
 
 
 
-## x86(nams,masm,att)
+## x86_64(nams,masm,att)
 ### L
 #### lea
 ```asm

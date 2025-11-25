@@ -1,10 +1,10 @@
-# 网络sys-socket.h
+# 网络(sys∕socket.h)
 
 ## 6.1. socket
 
 位于`#include <sys/socket.h>`中，以下函数 Linux 系统调用函数（除了send，recv）
 
-```
+```c
 socket()                    : 创建套接字
 bind()                      : 绑定套接字到本地地址
 listen()                    : 监听网络连接
@@ -20,7 +20,7 @@ close() ,shutdown()         : 关闭套接字
 getsockopt(), setsockopt()  : 获取和设置套接字选项
 ```
 
-```
+```c
 recv() 是一个用户空间的函数，recvfrom() 是一个系统调用函数
 
 ssize_t recv(int sockfd, void *buf, size_t len, int flags) {
@@ -33,7 +33,7 @@ ssize_t recvfrom(int sockfd, void *buf, size_t len, int flags, struct sockaddr *
 
 创建一个服务端
 
-```
+```c
 int main(){
     // AF_INET：ipv4 地址；SOCK_STREAM：面向 TCP 的 socket stream,protocol；认协议，根据前面的选择而来 TCP
     int socket_fd = socket(AF_INET, SOCK_STREAM, 0);
