@@ -1,5 +1,7 @@
-# x64 calling convention
-## x64 register usage
+# calling convention
+
+## windows
+### 参数传递、参数返回
 在 x64 架构下有：
 - 16 个通用整数寄存器（RAX, RBX, RCX, … R15）
 - 16 个 XMM/YMM 寄存器（向量/浮点寄存器）
@@ -46,3 +48,4 @@
         - 前四个整数参数通过 RCX, RDX, R8, R9 传递
         - 前四个浮点参数通过 XMM0-XMM3 传递
         - 多余参数通过栈传递
+### 栈帧创建、销毁

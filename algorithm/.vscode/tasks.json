@@ -10,6 +10,7 @@
                 ";",
                 //cl /EHsc /source-charset:utf-8 /execution-charset:utf-8 /Fe:solution.exe solution.cpp
                 "cl",
+                "/FAs",
                 "/EHsc",
                 "/Zi",
                 "/nologo",
