@@ -1,4 +1,4 @@
-# pointer declaration
+# pointer
 ## 语法
 指针是一种对象类型，指向一个函数或者另一种类型的对象，也可能不指向任何东西，这种情况由特殊的空指针值（null pointer value）表示
 ```c

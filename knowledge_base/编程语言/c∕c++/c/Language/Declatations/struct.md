@@ -1,4 +1,4 @@
-# struct declaration
+# struct
 
 ## 基本用法
 ### 结构体变量单个
