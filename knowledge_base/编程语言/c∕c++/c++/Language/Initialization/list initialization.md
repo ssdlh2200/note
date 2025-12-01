@@ -33,6 +33,43 @@ int y = {10.2}; //编译器❌报错
 ```
 ## 直接列表初始化
 ### 语法
+| 直接列表初始化                                                                                                                         |
+| ------------------------------------------------------------------------------------------------------------------------------- |
+| **T object { arg1, arg2, ... };<br>T object {.des1 = arg1 , .des2 { arg2 } ... };** c++20起                                      |
+| **T { arg1, arg2, ... }<br>T {.des1 = arg1 , .des2 { arg2 } ... }** c++20起                                                      |
+| **new T { arg1, arg2, ... }<br>new T {.des1 = arg1 , .des2 { arg2 } ... }** c++20起                                              |
+| **Class { T member { arg1, arg2, ... }; };<br>Class { T member {.des1 = arg1 , .des2 { arg2 } ... }; };** c++20起                |
+| **Class::Class() : member { arg1, arg2, ... } {...<br>Class::Class() : member {.des1 = arg1 , .des2 { arg2 } ...} {...** c++20起 |
+### 特性
+1. 对于普通类，如果类有匹配的构造函数，会直接调用
+2. 优先匹配std::initializer_list构造函数
 ```cpp
-T object {arg1, arg2}
+#include<iostream>  
+  
+class Foo {  
+public:  
+    int x;  
+    int y;  
+};  
+class DirectInit {  
+public:  
+    int a;  
+    int b;  
+    Foo f1 {70, 80};  
+    DirectInit (int a, int b) : a{a}, b{b}{}  
+    //当然也可以  
+    //✔️DirectInit (int a, int b) : a{70}, b{80}{}  
+    //✔️DirectInit (int a, int b) : a(a), b(b){};  
+DirectInit foo() {  
+    return DirectInit{30, 40};  
+}  
+  
+int main(){  
+    DirectInit d1{10, 20};  
+    DirectInit d2 = foo();  
+    DirectInit* d3 = new DirectInit{50, 60};  
+    
+    delete d3;  
+    return 0;  
+}
 ```
