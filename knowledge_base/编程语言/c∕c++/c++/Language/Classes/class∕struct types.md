@@ -1,6 +1,7 @@
-# class、struct types
+# class∕struct types
 
 ## 语法
+语法一：
 ```scss
 class-key 
 attr ﻿(optional) 
@@ -9,12 +10,19 @@ class-property-specs ﻿(optional)
 base-clause ﻿(optional)
 { member-specification }
 ```
-- **class-key：** 由class、struct、union三个组成
-    - class <font color="#7030a0">默认成员是private</font>
-    - struct 默认成员是public
-    - union 表示联合体
+语法二：
+```scss
+class-key
+attr ﻿(optional) 
+base-clause ﻿(optional)
+{ member-specification }
+```
+
+- **class-key：** 由class、struct、union三个组成，其中**class和struct几乎是完全相同的**，唯一区别在于默认成员访问权限、默认基类继承权限。如果使用union，那么声明的是一个联合体类型
+    - class默认成员是private，struct默认成员是public
+    - class默认private继承，struct默认public继承
 - **attr：** 自c++11起可用，例如alignas指定对其要求
-- **class-head-name：** 类名（可以带命名空间限定符）
+- **class-head-name：** 类名（可以带命名空间限定符例如：MyNamespace::MyClass）
 - **class-property-specs：** c++11起引入的一组修饰符，每个最多使用一次
     - final(c++11)：该类不能被继承
     - trivially_relocatable_if_eligible(c++26)：如果符合条件，标记类为可平凡移动
@@ -22,56 +30,42 @@ base-clause ﻿(optional)
 - **baes-clause：** 基类列表，指定继承的类型及其访问控制（public Base，private Base）
 - **member-specification：** 类的主体，包含成员变量，成员函数，访问说明符
 ## 前向声明Forward declaration
-### 语法
+### 前向声明的使用
 ```scss
 //语法
-
 class-key attr identifier;
 ```
-在当前作用域声明一个类类型，但不定义具体内容。
-在类的定义出现之前，这个类被称为不完全类（incomplete type）
-### 互相引用的类
-向前声明允许两个类相互引用🔁
+在当前作用域声明一个类，但是没有具体定义，此类就是前向声明。前向声明的类是不完整类型（incomplete type），对于前向声明的类
+- 可以声明指针或引用
+- 不能声明对象（因为编译器无法得知大小）
+完整定义与前向声明的不同
+- **完整定义：** 类的所有成员，函数，大小都已知，可以创建对象，访问成员
+- **前向声明：** 只告诉编译器则是一个类或者结构体，但是没有定义，不能创建对象，只能使用指针或者引用
 ```cpp
-class Vector; // 前向声明,后面会有一个Vector的类
+class B;
 
-class Matrix
-{
-    // ...
-    friend Vector operator*(const Matrix&, const Vector&);
-};
+class A {
+    B* b; //可以使用B*或B&
+          //B b2❌错误，不能声明对象
+}
 
-class Vector
-{
-    // ...
-    friend Vector operator*(const Matrix&, const Vector&);
-};
+class B {
+          //A此时已经是完整定义
+    A a;  //B中可以直接包含A
+}
 ```
-### 减少头文件依赖
-如果某个源文件只是用类的指针或引用，那么通过向前声明可以避免包含完整的头文件，减少编译依赖
-- 在 C++ 中，当你 \#include 一个头文件时，编译器实际上把头文件内容直接插入到当前文件
-- 如果头文件很大或包含很多其他头文件，编译器就需要处理更多代码
+如果某个源文件只是使用类的指针或引用，那么前向声明可以
+- 避免包含完整的头文件，减少编译依赖
 - 如果多个文件都包含了同样的头文件，每次编译都会重复处理，导致编译变慢
 - 过多依赖还可能引起循环依赖问题（两个类互相包含对方的头文件）
-**完整定义：** 类的所有成员，函数，大小都已知。可以创建对象，访问成员
-**前向声明：** 只告诉编译器则是一个类或者结构体，但是没有定义，不能创建对象，只能使用指针或者引用
-```cpp
-class MyClass; //前向声明
-MyClass* p; //声明指针
-MyClass& r; //声明引用
-MyClass obj; //错误，编译器不知道大小
-```
-
 ```cpp
 // MyStruct.h
-#include <iosfwd> // 包含前向声明std::ostream
-struct MyStruct
-{
-    int value;
-    friend std::ostream& operator<<(std::ostream& os, const MyStruct& s);
-    // 函数的定义放在 MyStruct.cpp 中，那里才需要 #include <ostream>
+#include <iosfwd> // 轻量级前向声明头文件，包含前向声明std::ostream
+class Foo {  
+public:  
+  //函数的定义放在ostream.hpp文件中，此时编译不会将ostream头文件插入到这里
+  std::ostream& os;  
 };
-
 ```
 ### 局部作用域中的前向声明
 如果向前声明出现在局部作用域（函数内部），它会隐藏外层作用域中相同名字的声明
@@ -82,30 +76,22 @@ struct s; //无影响，全局作用域内s已定义
 void g()  
 {  
     struct s; //声明一个新的struct s(隐藏全局s)  
-    s* p; //指向局部struct s的指针  
+    s* p;     //s是指向局部struct s的指针  
     struct s { char* p; }; //定义局部struct s  
 }
 ```
-1. 外层有一个全局 struct s { int a; };
-2. 函数 g() 里再次写 struct s;，这定义了一个新的、局部的 s（隐藏外层的）。
-3. 到函数末尾之前，全局的 s 不可见。
-4. 这说明前向声明在局部作用域中也遵循“名字遮蔽规则”
-- **复杂情况，作为类型说明符的一部分**
+- 到函数末尾之前，全局的 s 不可见。
+- 这说明前向声明在局部作用域中也遵循“名字遮蔽规则”
+注意，一个新的类名也可以通过**完整类型说明符（elaborated type specifier）在其他声明中引入，但前提是名字查找找不到之前已声明的同名类**。
 ```cpp
-class U;  
-  
-namespace ns  
-{  
-    class Y f(class T p); //声明函数ns::f, 并声明ns::T, ns::Y  
-    class U f();  
-    //可以使用指针指向T和Y  
-    Y* p;  
-    T* q;  
+struct A; // 前向声明
+
+void f() {
+    class A* p; // 使用前向声明的 A，不会创建新类
+    class B* q; // B 尚未声明，会引入新的类名 B
 }
+
 ```
-1. 声明了一个函数 f，返回类型为 Y，参数类型为 T。
-2. 由于 T 和 Y 在此命名空间中未定义，C++ 自动把它们当作前向声明的类。
-3. 第二个函数 class U f(); 中的 U 是在命名空间外定义的全局 U
 ## 成员规范Member specification
 ### 语法
 ```cpp

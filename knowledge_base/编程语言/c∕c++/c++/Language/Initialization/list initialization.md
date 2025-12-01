@@ -43,6 +43,7 @@ int y = {10.2}; //编译器❌报错
 ### 特性
 1. 对于普通类，如果类有匹配的构造函数，会直接调用
 2. 优先匹配std::initializer_list构造函数
+### 示例
 ```cpp
 #include<iostream>  
   
@@ -73,3 +74,14 @@ int main(){
     return 0;  
 }
 ```
+
+## 拷贝列表初始化
+| 拷贝列表初始化                                                                                                                  |
+| ------------------------------------------------------------------------------------------------------------------------ |
+| **T object = { arg1, arg2, ... };**<br>**T object = {.des1 = arg1 , .des2 { arg2 } ... };** c++20起                       |
+| **function({ arg1, arg2, ... })**<br>**function({.des1 = arg1 , .des2 { arg2 } ... })** c++20起                           |
+| **return { arg1, arg2, ... };**<br>**return {.des1 = arg1 , .des2 { arg2 } ... };** c++20起                               |
+| **object[{ arg1, arg2, ... }]**<br>**object[{.des1 = arg1 , .des2 { arg2 } ... }]** c++20起                               |
+| **object = { arg1, arg2, ... }**<br>**object = {.des1 = arg1 , .des2 { arg2 } ... }** c++20起                             |
+| **U({ arg1, arg2, ... })**<br>**U({.des1 = arg1 , .des2 { arg2 } ... })** c++20起                                         |
+| **Class { T member = { arg1, arg2, ... }; };**<br>**Class { T member = {.des1 = arg1 , .des2 { arg2 } ... }; };** c++20起 |
