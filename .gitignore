@@ -13,3 +13,6 @@
 
 # idea
 .idea
+
+# 书
+*.pdf
