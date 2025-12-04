@@ -1,6 +1,7 @@
 #include<iostream>
 #include<vector>
 #include<string>
+#include<sstream>
 
 using namespace std;
 
@@ -10,8 +11,10 @@ public:
     string simplifyPath(string path) {
         
         vector<string> stack;
-        stringstream
-
+        string s;
+        istringstream iss{path};
+        
+        getline(iss, s, '/');
         return "";
     }
 };

@@ -24,7 +24,9 @@
 			"xutility": "cpp",
 			"solution": "cpp",
 			"xstring": "cpp",
-			"iosfwd": "cpp"
+			"iosfwd": "cpp",
+			"string": "cpp",
+			"istream": "cpp"
 		},
 		"codeRun.launchs": {
 			"cpp": "debug c/cpp msvc",
