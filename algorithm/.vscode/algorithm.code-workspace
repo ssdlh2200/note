@@ -22,7 +22,9 @@
 			"xhash": "cpp",
 			"utility": "cpp",
 			"xutility": "cpp",
-			"solution": "cpp"
+			"solution": "cpp",
+			"xstring": "cpp",
+			"iosfwd": "cpp"
 		},
 		"codeRun.launchs": {
 			"cpp": "debug c/cpp msvc",
