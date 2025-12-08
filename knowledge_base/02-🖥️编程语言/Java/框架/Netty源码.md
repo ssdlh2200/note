@@ -6,7 +6,6 @@
 + <font style="color:rgb(31, 35, 40);">event-driven（事件驱动）：IO多路复用</font>
 + <font style="color:rgb(31, 35, 40);">这里的异步指的是Netty采用了多线程，将方法调用和处理结果相分离</font>
 
-:::
 
 # Netty初认识
 服务端
