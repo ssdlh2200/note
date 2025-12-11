@@ -48,10 +48,7 @@ echo \
 #   $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 ```
 
-:::info
 以上命令会添加稳定版本的 Docker APT 镜像源，如果需要测试版本的 Docker 请将 stable 改为 test。
-
-:::
 
 6. 更新 apt 软件包缓存，并安装 docker-ce
 
