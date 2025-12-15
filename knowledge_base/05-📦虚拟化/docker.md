@@ -63,35 +63,6 @@ sudo apt-get install docker-ce docker-ce-cli containerd.io
 ```plain
 docker -v
 ```
-
-### CentOS安装
-[https://developer.aliyun.com/article/1397561?spm=5176.26934562.main.1.7b7a4cb4tTCN1X](https://developer.aliyun.com/article/1397561?spm=5176.26934562.main.1.7b7a4cb4tTCN1X)
-
-1. **第一步**
-
-```java
-#1、yum包更新到最新
-yum update
-#2、安装需要的软件包，yum-uti1提供yum-config-manager:功能，另外两个是devicemapper驱动依赖的
-yum install -y yum-utils device-mapper-persistent-data lvm2
-#3、设置yum源
-yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-#4、安装docker,出现输入的界面都按y
-yum install y docker-ce
-#5、查看docker.版本，验证是否验证成功
-docker -v
-```
-
-2. **第二步**
-
-默认情况下，将来从docker hub([https://hub.docker..coml)](https://hub.docker..coml))上下载
-
-+ 阿里云
-    - 登录阿里云
-    - 搜索镜像加速器
-    - ![](https://cdn.nlark.com/yuque/0/2023/png/33704534/1685429148108-9ed50e05-f916-4794-b3fa-93d011b2fd42.png)
-    - cat /etc/docker/daemon.json查看是否配置成功
-
 # 容器数据卷
 ![](https://cdn.nlark.com/yuque/0/2023/png/33704534/1685434018194-ef2a8360-a109-448b-803a-9d15d8ba69c0.png)
 
