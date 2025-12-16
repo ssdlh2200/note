@@ -1,31 +1,25 @@
-# 常见问题
-## docker tcp模式启动
+# docker
+## 常见问题
+### docker tcp模式启动
 [https://blog.csdn.net/qq_31387691/article/details/138630461](https://blog.csdn.net/qq_31387691/article/details/138630461)
 
-# 安装/换源
-## Ubuntu安装
+## 安装/换源/镜像代理
+### Ubuntu安装(ubuntu有脚本)
 1. 卸载可能存在的版本
-
 ```plain
 sudo apt-get remove docker \
              docker-engine \
              docker-ce docker.io
 ```
-
 2. 更新源
-
 ```plain
 sudo apt-get update
 ```
-
 3. 安装依赖
-
 ```plain
 sudo apt install -y apt-transport-https ca-certificates curl software-properties-common
 ```
-
 4. 为了确认所下载软件包的合法性，需要添加软件源的 GPG 密钥
-
 ```plain
 curl -fsSL https://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 
@@ -33,9 +27,7 @@ curl -fsSL https://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | sudo gpg --de
 # 官方源
 # curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 ```
-
 5. 然后，我们需要向 sources.list 中添加 Docker 软件源
-
 ```plain
 echo \
   "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://mirrors.aliyun.com/docker-ce/linux/ubuntu \
@@ -47,22 +39,33 @@ echo \
 #   "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
 #   $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 ```
-
 以上命令会添加稳定版本的 Docker APT 镜像源，如果需要测试版本的 Docker 请将 stable 改为 test。
-
 6. 更新 apt 软件包缓存，并安装 docker-ce
-
 ```plain
 sudo apt-get update
 
 sudo apt-get install docker-ce docker-ce-cli containerd.io
 ```
-
 7. 验证
-
 ```plain
 docker -v
 ```
+
+### 下载镜像配置代理
+- 开启代理监听本地10808端口
+- sudo vi /lib/systemd/system/docker.service，<font color="#d83931"><b>注意：这两个都要设置为http</b></font>
+```
+[Service]
+Environment="HTTP_PROXY=http://127.0.0.1:10808"
+Environment="HTTPS_PROXY=http://127.0.0.1:10808"
+```
+- 执行重启，读取配置
+```sh
+sudo systemctl daemon-reload && \
+sudo systemctl restart docker
+```
+- 两个命令都要执行让代理生效
+
 # 容器数据卷
 ![](https://cdn.nlark.com/yuque/0/2023/png/33704534/1685434018194-ef2a8360-a109-448b-803a-9d15d8ba69c0.png)
 

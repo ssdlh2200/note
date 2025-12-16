@@ -11,12 +11,6 @@
 
 ## 系统代理
 
-### 系统代理绕过某些域名
-
-![](https://cdn.nlark.com/yuque/0/2024/png/33704534/1726124086630-95f65c7d-ef45-4c5e-add6-c7b47a792533.png)
-
-![](https://cdn.nlark.com/yuque/0/2024/png/33704534/1726124098907-18db0a4d-a1a6-425b-a929-3af1b26aac89.png)
-
 ## TUN模式
 Tun模式原理是在电脑上安装了一张虚拟网卡，让所有流量都走这个代理
 - [https://www.youtube.com/watch?v=c2UdUj0XpNE](https://www.youtube.com/watch?v=c2UdUj0XpNE)
