@@ -1,5 +1,3 @@
-version: '3.7'
-
 services:
   #地面服务器配置
   dst_server_master:
@@ -10,7 +8,8 @@ services:
       - "10998:10998/udp"
       - "10999:10999/udp"
     volumes:
-      - /home/ssdlh/dockers/dst/dst_config:/home/steam/dst_config
+      #相对于yml的路径
+      - dst_config_vol:/home/steam/dst_config
     environment:
       CLUSTER_NAME: dst_server   #服务器文件夹名
       WORLD_NAME: master         #世界显示名
@@ -27,7 +26,7 @@ services:
       - "11000:11000/udp"
       - "11001:11001/udp"
     volumes:
-      - /home/ssdlh/dockers/dst/dst_config:/home/steam/dst_config
+      - dst_config_vol:/home/steam/dst_config
     environment:
       CLUSTER_NAME: dst_server
       WORLD_NAME: caves
@@ -38,3 +37,12 @@ services:
       LAN_ONLY: "true"
       # SERVER_PASSWORD: XXX设置连接密码
       # CLUSTER_TOKEN: "在这里粘贴您的Klei服务器令牌"
+
+  volumes:
+    dst_config_vol:
+      name: dst_config
+      driver: local
+      driver_opts:
+        type: 'none'
+        o: 'bind'
+        device: './dst_config'

@@ -66,9 +66,9 @@ sudo systemctl restart docker
 ```
 - 两个命令都要执行让代理生效
 
-# 容器数据卷
+## 数据卷volume
+### 数据卷概念
 ![](https://cdn.nlark.com/yuque/0/2023/png/33704534/1685434018194-ef2a8360-a109-448b-803a-9d15d8ba69c0.png)
-
 + 数据卷
     - 数据卷是宿主机中的一个目录或文件
     - 当容器目录和数据卷目录绑定后，对方的修改会立即同步
@@ -78,14 +78,15 @@ sudo systemctl restart docker
     - 容器数据持久化
     - 外部机器和容器间接通信
     - 容器之间数据交换
+### 数据卷挂载机制
+- docker volume 数据卷挂载的机制（目录和配置文件）
+	- https://zhuanlan.zhihu.com/p/694490923（已存档）
 
 ### 配置数据卷
 + 创建启动容器时，使用-v参数设置数据卷
 
-```java
-docker run ... -v 宿主机目录:容器内目录
-
-docker run -it --name=testDocker2 -v /root/data:/root/data_container centos:centos7 /bin/bash
+```docker
+-v 宿主机目录:容器内目录
 ```
 
 注意事项： 
@@ -102,7 +103,7 @@ docker run -it --name=testDocker2 -v /root/data:/root/data_container
 ### 数据卷容器
 ![](https://cdn.nlark.com/yuque/0/2023/png/33704534/1685443225073-2555bf75-ced1-49c1-aaa1-a0af522a0b81.png)
 
-#### 配置数据卷容器
+### 配置数据卷容器
 ```java
 docker run -it --name=c3 -v /volume centos:7 /bin/bash
 
@@ -110,7 +111,6 @@ docker run -it --name=c1 --volumes-from c3 centos:7 /bin/bash
 docker run -it --name=c2 --volumes-form c3 centos:7 /bin/bash
 ```
 
-:::info
 数据卷小结
 
 数据卷概念
@@ -127,8 +127,6 @@ docker run -it --name=c2 --volumes-form c3 centos:7 /bin/bash
 创建一个容器，挂载一个目录，让其他容器继承自该容器(--volume-from)。
 
 1. 通过简单方式实现数据卷配置
-
-:::
 
 # 应用部署
 [https://hub.docker.com](https://hub.docker.com) 可以查看镜像版本
