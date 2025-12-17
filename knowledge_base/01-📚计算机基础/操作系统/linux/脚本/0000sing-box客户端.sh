@@ -1,9 +1,7 @@
 CONFIG_JSON_DIR="/home/ssdlh/.config/sing-box/"
 CONFIG_JSON_FULL_PATH="/home/ssdlh/.config/sing-box/config.json"
-
-
 SING_BOX_SERVICE_FULL_PATH="/etc/systemd/system/sing-box.service"
-
+# json 需要自己手动输入................
 CONFIG_JSON=\
 "
 {
@@ -35,31 +33,7 @@ CONFIG_JSON=\
 				]
 			}
 		} 
-	],
-	只能生效一个！！
-	"outbounds": [
-    {
-      "server": "66.154.107.58",
-      "server_port": 12900,
-      "uuid": "849385f2-c4ef-43d5-aecf-e90f6d697d91",
-      "packet_encoding": "xudp",
-      "type": "vless",
-      "tag": "proxy",
-      "tls": {
-        "enabled": true,
-        "server_name": "amd.com",
-        "insecure": false,
-        "utls": {
-          "enabled": true,
-          "fingerprint": "chrome"
-        },
-        "reality": {
-          "enabled": true,
-          "public_key": "GQCu5K5Yzlemp7J2bur4LO2FhG2Qmp8RRWDgjJt_Nlc",
-          "short_id": "0123456789abcdef"
-        }
-      }
-    }
+	]
 }
 "
 
