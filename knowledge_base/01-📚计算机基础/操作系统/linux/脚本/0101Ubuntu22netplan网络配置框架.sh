@@ -1,7 +1,7 @@
 #自定义网络配置=============================================
 #查看所有网卡名：networkctl list
 TARGET_DIR="/etc/netplan/"
-TARGET_FILE="02-static-wlp3s0.yaml"
+TARGET_FILE="02-static-wlp3s0.yaml" # <--------需要修改
 FULL_PATH="${TARGET_DIR}${TARGET_FILE}"
 CONTENT=\
 "
